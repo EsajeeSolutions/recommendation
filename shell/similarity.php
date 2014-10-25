@@ -197,7 +197,6 @@ USAGE;
             'properties' => $properties,
             'eventTime' => $eventTime,
         ]);
-        echo "user";
         $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_userUrl, $json);
     }
 
@@ -235,10 +234,8 @@ USAGE;
             'eventTime' => $eventTime,
         ]);
 
-        echo "Item";
         $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_itemsUrl, $json);
-
-        #$this->_addAction($_productId, $customerId);
+        $this->_addAction($_productId, $customerId);
 
     }
 
