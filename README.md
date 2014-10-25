@@ -12,6 +12,7 @@ Once downloaded copy the contents (app) folders to your project root merging wit
 ### Requirements
 
 Must have an instance of PredictionIO server setup and ready to accept data. Please see the docs for information.
+For a simple Vagrant installation, check out https://github.com/magento-hackathon/PredictionIO-Vagrant.
 
 ### Features
 
