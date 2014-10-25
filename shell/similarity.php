@@ -197,6 +197,7 @@ USAGE;
             'properties' => $properties,
             'eventTime' => $eventTime,
         ]);
+        echo "user";
         $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_userUrl, $json);
     }
 
@@ -245,13 +246,22 @@ USAGE;
      * @param int $customerId Customer ID of loggedin customer
      */
     private function _addAction($_productId, $customerId) {
+		$eventTime = (new \DateTime())->format(DateTime::ISO8601);
+		$properties = array();
+		if (empty($properties)) $properties = (object)$properties;
+		$json = json_encode([
+			'event' => 'conversion',
+			'entityType' => 'pio_user',
+			'entityId' => $customerId,
+			'targetEntityType' => 'pio_item',
+			'targetEntityId' => $_productId,
+			'appId' => (int) $this->_helper->getEngineKey(),
+			'properties' => $properties,
+			'eventTime' => $eventTime,
+		]);
+		if(!$_productId || !$customerId) echo 'product ID: ' . $_productId . ' - customer ID: ' . $customerId . PHP_EOL;
 
-        $fields_string = 'pio_appkey='.$this->_helper->getEngineKey().'&';
-        $fields_string .= 'pio_uid='.$customerId.'&';
-        $fields_string .= 'pio_iid='.$_productId.'&';
-        $fields_string .= 'pio_action=conversion';
-        $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_actionsUrl, $fields_string);        
-
+        $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_actionsUrl, $json);
     }
 
     /**
@@ -260,7 +270,6 @@ USAGE;
      * @param  string $fields_string Query params for POST data
      */
     private function postCurl($url, $fields_string) {
-
         $client = new Zend_Http_Client('http://'.$url,
             array(
             'maxredirects' => 0,
@@ -268,7 +277,7 @@ USAGE;
         );
         $client->setRawData($fields_string, 'application/json')->request('POST');
         $status = $client->getLastResponse();
-        echo $status;
+        echo $status .PHP_EOL;
     }
 
 }
