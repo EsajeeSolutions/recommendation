@@ -172,7 +172,7 @@ USAGE;
                 $products = $items['items'];
             }
 
-            $this->_addCustomer($customerId);           
+            $this->_addCustomer($customerId);
             $this->_addItems($products, $customerId);
         }
     }
@@ -188,15 +188,16 @@ USAGE;
 
         $eventTime = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
         $properties = array();
+        if (empty($properties)) $properties = (object)$properties;
         $json = json_encode([
             'event' => '$set',
             'entityType' => 'pio_user',
             'entityId' => $customerId,
-            'appId' => $this->appId,
+            'appId' => (int) $this->_helper->getEngineKey(),
             'properties' => $properties,
             'eventTime' => $eventTime,
         ]);
-
+        echo "user";
         $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_userUrl, $json);
     }
 
@@ -223,21 +224,21 @@ USAGE;
         }
         $eventTime = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
         $properties = array();
+        if (empty($properties)) $properties = (object)$properties;
+
         $json = json_encode([
             'event' => '$set',
             'entityType' => 'pio_item',
             'entityId' => $_productId,
-            'appId' => $this->appId,
+            'appId' => $this->_helper->getEngineKey(),
             'properties' => $properties,
             'eventTime' => $eventTime,
         ]);
 
-        $fields_string = 'pio_appkey='.$this->_helper->getEngineKey().'&';
-        $fields_string .= 'pio_iid='.$_productId.'&';
-        $fields_string .= 'pio_itypes=1';
+        echo "Item";
         $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_itemsUrl, $json);
 
-        $this->_addAction($_productId, $customerId);
+        #$this->_addAction($_productId, $customerId);
 
     }
 
@@ -268,9 +269,9 @@ USAGE;
             'maxredirects' => 0,
             'timeout' => 1)
         );
-        $command = $fields_string;
-        $client->setRawData($command, 'application/json')->request('POST');
+        $client->setRawData($fields_string, 'application/json')->request('POST');
         $status = $client->getLastResponse();
+        echo $status;
     }
 
 }
