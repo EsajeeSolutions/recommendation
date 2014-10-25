@@ -14,6 +14,7 @@
 require_once 'abstract.php';
 class Richdynamix_Shell_Similarity extends Mage_Shell_Abstract
 {
+    const DATE_TIME_FORMAT = DateTime::ISO8601;
 
     /**
      * Define the a list of stores to run
@@ -37,19 +38,19 @@ class Richdynamix_Shell_Similarity extends Mage_Shell_Abstract
      * API Endpoint for users
      * @var string
      */
-    protected $_userUrl = 'users.json';
+    protected $_userUrl = 'events.json';
 
     /**
      * API Endpoint for items
      * @var string
      */
-    protected $_itemsUrl = 'items.json';
+    protected $_itemsUrl = 'events.json';
 
     /**
      * API Endpoint for users-to-item actions
      * @var string
      */
-    protected $_actionsUrl = 'actions/u2i.json';
+    protected $_actionsUrl = 'events.json';
 
     /**
      * Setup the run command with the right data to process
@@ -182,9 +183,21 @@ USAGE;
      */
     private function _addCustomer($customerId) {
 
-        $fields_string = 'pio_appkey='.$this->_helper->getEngineKey().'&';
-        $fields_string .= 'pio_uid='.$customerId;
-        $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_userUrl, $fields_string);
+        #$fields_string = 'pio_appkey='.$this->_helper->getEngineKey().'&';
+        #$fields_string .= 'pio_uid='.$customerId;
+
+        $eventTime = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
+        $properties = array();
+        $json = json_encode([
+            'event' => '$set',
+            'entityType' => 'pio_user',
+            'entityId' => $customerId,
+            'appId' => $this->appId,
+            'properties' => $properties,
+            'eventTime' => $eventTime,
+        ]);
+
+        $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_userUrl, $json);
     }
 
     /**
@@ -208,11 +221,21 @@ USAGE;
                 }
             }
         }
+        $eventTime = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
+        $properties = array();
+        $json = json_encode([
+            'event' => '$set',
+            'entityType' => 'pio_item',
+            'entityId' => $_productId,
+            'appId' => $this->appId,
+            'properties' => $properties,
+            'eventTime' => $eventTime,
+        ]);
 
         $fields_string = 'pio_appkey='.$this->_helper->getEngineKey().'&';
         $fields_string .= 'pio_iid='.$_productId.'&';
         $fields_string .= 'pio_itypes=1';
-        $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_itemsUrl, $fields_string);
+        $this->postCurl($this->_helper->getApiHost().':'.$this->_helper->getApiPort().'/'.$this->_itemsUrl, $json);
 
         $this->_addAction($_productId, $customerId);
 
@@ -239,23 +262,15 @@ USAGE;
      * @param  string $fields_string Query params for POST data
      */
     private function postCurl($url, $fields_string) {
-        //open connection
-        $ch = curl_init();
 
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch,CURLOPT_URL, $url);
-        curl_setopt($ch,CURLOPT_POST, 1);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch,CURLOPT_VERBOSE, 1);
-
-        //execute post
-        $result = curl_exec($ch);
-
-        // var_dump($result);
-
-        //close connection
-        curl_close($ch);
+        $client = new Zend_Http_Client('http://'.$url,
+            array(
+            'maxredirects' => 0,
+            'timeout' => 1)
+        );
+        $command = $fields_string;
+        $client->setRawData($command, 'application/json')->request('POST');
+        $status = $client->getLastResponse();
     }
 
 }

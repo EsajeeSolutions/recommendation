@@ -15,19 +15,19 @@ class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
 	 * API Endpoint for users
 	 * @var string
 	 */
-	protected $_userUrl = 'users.json';
+	protected $_userUrl = 'events.json';
 
 	/**
 	 * API Endpoint for items
 	 * @var string
 	 */
-	protected $_itemsUrl = 'items.json';
+	protected $_itemsUrl = 'events.json';
 
 	/**
 	 * API Endpoint for users-to-item actions
 	 * @var string
 	 */
-	protected $_actionsUrl = 'actions/u2i.json';
+	protected $_actionsUrl = 'events.json';
 
 	/**
 	 * API Endpoint for similarity engine.
@@ -264,4 +264,3 @@ class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
 	}
 
 }
-	 
