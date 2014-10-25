@@ -223,7 +223,7 @@ USAGE;
             }
         }
         $eventTime = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
-        $properties = array();
+        $properties = array('pio_itypes' => array('1'));
         if (empty($properties)) $properties = (object)$properties;
 
         $json = json_encode([
