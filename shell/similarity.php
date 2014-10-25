@@ -230,7 +230,7 @@ USAGE;
             'event' => '$set',
             'entityType' => 'pio_item',
             'entityId' => $_productId,
-            'appId' => $this->_helper->getEngineKey(),
+            'appId' => (int) $this->_helper->getEngineKey(),
             'properties' => $properties,
             'eventTime' => $eventTime,
         ]);
