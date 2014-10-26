@@ -17,14 +17,17 @@ class Hackathon_Predictionio_Model_Observer
      *
      * @var NULL
      */
+    protected $_model;
     protected $_helper;
+
 
     /**
      * Construct for assigning helper class to helper object
      */
     public function __construct()
     {
-        $this->_helper = Mage::helper('predictionio');
+        $this->_model = Mage::getModel('predictionio/prediction');
+        $this->_helper = Mage::helpers('predictionio');
     }
 
     /**
@@ -75,7 +78,7 @@ class Hackathon_Predictionio_Model_Observer
     {
         if ($this->_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
             $customer = $observer->getEvent()->getCustomer();
-            $this->_helper->_addCustomer($customer->getId());
+            $this->_model->_addCustomer($customer->getId());
 
             // Check if there is a guest actions log
             $guestActions = Mage::getSingleton('core/session')->getGuestActions();
@@ -98,15 +101,15 @@ class Hackathon_Predictionio_Model_Observer
         if (isset($guestActions['product_view'])) {
             foreach ($guestActions['product_view'] as $item) {
                 $product = Mage::getModel('catalog/product')->load($item);
-                $this->_helper->_addItem($product);
-                $this->_helper->_addAction($product->getId(), $customerId, 'view');
+                $this->_model->_addItem($product);
+                $this->_model->_addAction($product->getId(), $customerId, 'view');
             }
         }
         if (isset($guestActions['product_rate'])) {
             foreach ($guestActions['product_rate'] as $product_id => $rating) {
                 $product = Mage::getModel('catalog/product')->load($product_id);
-                $this->_helper->_addItem($product);
-                $this->_helper->_addAction($product_id, $customerId, 'rate', $rating);
+                $this->_model->_addItem($product);
+                $this->_model->_addAction($product_id, $customerId, 'rate', $rating);
             }
         }
         Mage::getSingleton('core/session')->unsGuestActions();
@@ -120,11 +123,11 @@ class Hackathon_Predictionio_Model_Observer
     public function productView(Varien_Event_Observer $observer)
     {
 
-        if ($this->_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
+        if ($this->_model->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
             $product  = Mage::registry('current_product');
             $customer = Mage::getSingleton('customer/session')->getCustomer();
-            $this->_helper->_addItem($product);
-            $this->_helper->_addAction($product->getId(), $customer->getId(), 'view');
+            $this->_model->_addItem($product);
+            $this->_model->_addAction($product->getId(), $customer->getId(), 'view');
         } else {
             $this->logGuestActions('view', Mage::registry('current_product'));
         }
@@ -152,8 +155,8 @@ class Hackathon_Predictionio_Model_Observer
             $rating = $newSumRatings / count($data['ratings']);
 
             if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-                $this->_helper->_addItem($product);
-                $this->_helper->_addAction($product->getId(), $customer->getId(), 'rate', $rating);
+                $this->_model->_addItem($product);
+                $this->_model->_addAction($product->getId(), $customer->getId(), 'rate', $rating);
             } else {
                 $this->logGuestActions('rate', Mage::registry('current_product'), $rating);
             }
@@ -174,8 +177,8 @@ class Hackathon_Predictionio_Model_Observer
             $items = $order->getItemsCollection();
 
             foreach ($items as $item) {
-                $this->_helper->_addItems($item->getProductId());
-                $this->_helper->_addAction($item->getProductId(), $customer->getId(), 'conversion');
+                $this->_model->_addItems($item->getProductId());
+                $this->_model->_addAction($item->getProductId(), $customer->getId(), 'conversion');
             }
         }
     }
