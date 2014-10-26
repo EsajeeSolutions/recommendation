@@ -5,6 +5,7 @@
  */
 class Richdynamix_SimilarProducts_Model_Prediction extends Mage_Core_Model_Abstract
 {
+    private $_helper = null;
 	/**
 	 * Get a specific amount ofrecommended products for the user
 	 *
@@ -23,7 +24,7 @@ class Richdynamix_SimilarProducts_Model_Prediction extends Mage_Core_Model_Abstr
             $this->getApiHost() . ':' . $this->getApiRecommendationPort() . '/' .
             Richdynamix_SimilarProducts_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
             $json
-        );
+        ));
 	}
 
     /**
