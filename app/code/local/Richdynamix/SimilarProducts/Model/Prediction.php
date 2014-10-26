@@ -5,27 +5,26 @@
  */
 class Richdynamix_SimilarProducts_Model_Prediction extends Mage_Core_Model_Abstract
 {
-    protected $_helper;
-    /**
-     * Get a specific amount of recommended products for the user
-     *
-     * @param int $customerId
-     * @param int $numProducts
-     */
-    public function getRecommendedProducts($customerId, $numProducts)
-    {
-        $json = json_encode(
-            [
-                'uid' => $customerId,
-                'n'   => $numProducts
-            ]
-        );
-        $this->postRequest(
+	/**
+	 * Get a specific amount ofrecommended products for the user
+	 *
+	 * @param int $customerId
+	 * @param int $numProducts
+	 */
+	public function getRecommendedProducts($customerId, $numProducts) {
+		$json = json_encode(
+			[
+				'uid'	=> $customerId,
+				'n'		=> $numProducts
+			]
+		);
+
+		$result = json_decode($this->postRequest(
             $this->getApiHost() . ':' . $this->getApiRecommendationPort() . '/' .
             Richdynamix_SimilarProducts_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
             $json
         );
-    }
+	}
 
     /**
      * Perform the POST Request
