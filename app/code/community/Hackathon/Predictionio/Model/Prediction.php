@@ -22,7 +22,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 
 		$result = json_decode($this->postRequest(
             $this->getApiHost() . ':' . $this->getApiRecommendationPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
+            Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
             $json
         ));
 	}
@@ -128,7 +128,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 
         $this->postRequest(
             $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
+            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
 
@@ -168,7 +168,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         );
         $this->_model->postRequest(
             $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
+            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
     }
