@@ -51,6 +51,24 @@
             <show_in_store>1</show_in_store>
 			<comment>Default 8000</comment>
           </predict_port>
+           <predict_recommendation_port translate="label">
+               <label>PredictionIO Recommendation Port</label>
+               <frontend_type>text</frontend_type>
+               <sort_order>3</sort_order>
+               <show_in_default>1</show_in_default>
+               <show_in_website>1</show_in_website>
+               <show_in_store>1</show_in_store>
+               <comment>Default 9997</comment>
+           </predict_recommendation_port>
+           <predict_ranking_port translate="label">
+               <label>PredictionIO Ranking Port</label>
+               <frontend_type>text</frontend_type>
+               <sort_order>3</sort_order>
+               <show_in_default>1</show_in_default>
+               <show_in_website>1</show_in_website>
+               <show_in_store>1</show_in_store>
+               <comment>Default 9993</comment>
+           </predict_ranking_port>
           <predict_key translate="label">
             <label>Similarity Engine Key</label>
 			      <frontend_type>text</frontend_type>

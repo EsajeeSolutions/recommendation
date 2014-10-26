@@ -240,6 +240,22 @@ class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
 	}
 
 	/**
+	 * PredictionIO API Ranking Port, Default is 9993 but needs to be defined
+	 * @return string
+	 */
+	public function getApiRankingPort(){
+		return Mage::getStoreConfig('similarproducts/settings/predict_ranking_port');
+	}
+
+	/**
+	 * PredictionIO API Recommendation Port, Default is 9997 but needs to be defined
+	 * @return string
+	 */
+	public function getApiRecommendationPort(){
+		return Mage::getStoreConfig('similarproducts/settings/predict_recommendation_port');
+	}
+
+	/**
 	 * Module ON/OFF Switch
 	 * @return bool
 	 */
