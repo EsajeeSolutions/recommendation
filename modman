@@ -1,3 +1,3 @@
-app/code/local/Richdynamix/SimilarProducts/ app/code/local/Richdynamix/SimilarProducts/
-app/etc/modules/Richdynamix_SimilarProducts.xml app/etc/modules/Richdynamix_SimilarProducts.xml
+app/code/community/Hackathon/Predictionio/ app/code/community/Hackathon/Predictionio/
+app/etc/modules/Hackathon_Predictionio.xml app/etc/modules/Richdynamix_Predictionio.xml
 shell/similarity.php shell/similarity.php

@@ -13,7 +13,7 @@
  */
 require_once 'abstract.php';
 
-class Richdynamix_Shell_Similarity extends Mage_Shell_Abstract
+class Hackathon_Shell_Prediction extends Mage_Shell_Abstract
 {
     const DATE_TIME_FORMAT = DateTime::ISO8601;
 

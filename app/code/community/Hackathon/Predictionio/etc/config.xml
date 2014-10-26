@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <config>
   <modules>
-    <Richdynamix_SimilarProducts>
+    <Hackathon_Predictionio>
       <version>0.1.0</version>
-    </Richdynamix_SimilarProducts>
+    </Hackathon_Predictionio>
   </modules>
 <!--   <frontend>
     <routers>
@@ -20,25 +20,25 @@
   </frontend> -->
   <global>
     <helpers>
-      <similarproducts>
-        <class>Richdynamix_SimilarProducts_Helper</class>
-      </similarproducts>
+      <predictionio>
+        <class>Hackathon_Predictionio_Helper</class>
+      </predictionio>
     </helpers>
   	<blocks>
-  	  <similarproducts>
-  		<class>Richdynamix_SimilarProducts_Block</class>
-  	  </similarproducts>
+  	  <predictionio>
+  		<class>Hackathon_Predictionio_Block</class>
+  	  </predictionio>
   			<catalog>
   				<rewrite>
-  					<product_list_upsell>Richdynamix_SimilarProducts_Block_Catalog_Product_List_Upsell</product_list_upsell>
+  					<product_list_upsell>Hackathon_Predictionio_Block_Catalog_Product_List_Upsell</product_list_upsell>
   				</rewrite>
   			</catalog>
   	</blocks>
   	<models>
-  	  <similarproducts>
-  		  <class>Richdynamix_SimilarProducts_Model</class>
-  		  <resourceModel>similarproducts_mysql4</resourceModel>
-  	  </similarproducts>
+  	  <predictionio>
+  		  <class>Hackathon_Predictionio_Model</class>
+  		  <resourceModel>predictionio_mysql4</resourceModel>
+  	  </predictionio>
   	</models>
     <events>
 
@@ -47,7 +47,7 @@
         <observers>
           <customer_login_handler>
             <type>model</type>
-            <class>similarproducts/observer</class>
+            <class>predictionio/observer</class>
             <method>addCustomer</method>
           </customer_login_handler>
         </observers>
@@ -58,7 +58,7 @@
         <observers>
           <catalog_controller_product_view_handler>
             <type>model</type>
-            <class>similarproducts/observer</class>
+            <class>predictionio/observer</class>
             <method>productView</method>
           </catalog_controller_product_view_handler>
         </observers>
@@ -69,7 +69,7 @@
         <observers>
           <review_save_after_handler>
             <type>model</type>
-            <class>similarproducts/observer</class>
+            <class>predictionio/observer</class>
             <method>productRate</method> 
           </review_save_after_handler>
         </observers>
@@ -79,7 +79,7 @@
       <checkout_type_onepage_save_order_after>
           <observers>
               <similarproducts_save_order_observer>
-                  <class>similarproducts/observer</class>
+                  <class>predictionio/observer</class>
                   <method>productSale</method>
               </similarproducts_save_order_observer>
           </observers>
