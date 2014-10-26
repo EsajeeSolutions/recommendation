@@ -39,7 +39,6 @@ class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function _addItem(Mage_Catalog_Model_Product $product)
     {
-
         $cats          = $this->getCategories($product);
         $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
         $fields_string .= 'pio_iid=' . $product->getId() . '&';
@@ -55,7 +54,6 @@ class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function _addItems($productid)
     {
-
         $product = Mage::getModel('catalog/product')->load($productid);
         $cats    = $this->getCategories($product);
         if ($product->getTypeId() == "simple") {
