@@ -2,8 +2,7 @@
 <layout>
     <default>
         <reference name="predictionio.recommendations">
-            <block type="" name="" as="" template="">
-            </block>
+            <block type="hackathon_predictionio/catalog_product_recommendations" name="predictionio.recommendations.products" as="recommended_products" template="hackathon_predictionio/catalog/product/recommendations.phtml" />
         </reference>
     </default>
 </layout>
