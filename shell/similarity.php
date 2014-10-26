@@ -207,6 +207,9 @@ USAGE;
      */
     private function _addCustomer($customerId)
     {
+        if (empty($customerId)) {
+            return;
+        }
         $eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
         $properties = array();
         if (empty($properties)) {
@@ -222,7 +225,11 @@ USAGE;
                 'eventTime'  => $eventTime,
             ]
         );
-        $this->_model->postRequest($this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' . $this->_userUrl, $json);
+        $this->_model->postRequest(
+            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
+            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_API_ENDPOINT,
+            $json
+        );
     }
 
     /**
@@ -250,6 +257,11 @@ USAGE;
                 }
             }
         }
+
+        if (empty($_productId)) {
+            return;
+        }
+
         $eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
         $properties = array('pio_itypes' => array('1'));
         if (empty($properties)) {
@@ -267,7 +279,11 @@ USAGE;
             ]
         );
 
-        $this->_model->postRequest($this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' . $this->_userUrl, $json);
+        $this->_model->postRequest(
+            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
+            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_API_ENDPOINT,
+            $json
+        );
         $this->_addAction($_productId, $customerId);
 
     }
@@ -282,6 +298,9 @@ USAGE;
      */
     private function _addAction($_productId, $customerId)
     {
+        if (empty($_productId) || empty($customerId)) {
+            return;
+        }
         $eventTime  = (new \DateTime())->format(DateTime::ISO8601);
         $properties = array();
         if (empty($properties)) {
@@ -299,10 +318,11 @@ USAGE;
             'eventTime'        => $eventTime,
             ]
         );
-        if (!$_productId || !$customerId) {
-            echo 'product ID: ' . $_productId . ' - customer ID: ' . $customerId . PHP_EOL;
-        }
-        $this->_model->postRequest($this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' . $this->_userUrl, $json);
+        $this->_model->postRequest(
+            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
+            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_API_ENDPOINT,
+            $json
+        );
     }
 
 }

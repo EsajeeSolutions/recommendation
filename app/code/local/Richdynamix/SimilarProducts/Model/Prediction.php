@@ -40,7 +40,7 @@ class Richdynamix_SimilarProducts_Model_Prediction extends Mage_Core_Model_Abstr
      * Perform the POST Request
      *
      * @param string $url  URL of PredictionIO API
-     * @param json   $json Query params for POST data
+     * @param string $json Query params for POST data
      *
      * @return void
      */

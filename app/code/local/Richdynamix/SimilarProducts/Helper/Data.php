@@ -10,6 +10,7 @@
  */
 class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
 {
+	const PREDICTION_API_ENDPOINT = 'events.json';
 
 	/**
 	 * API Endpoint for users
