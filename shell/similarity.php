@@ -156,7 +156,9 @@ USAGE;
     /**
      * Lets process each store sales
      *
-     * @param  string $store Pass in the store to process
+     * @param string $store Pass in the store to process
+     *
+     * @return void
      */
     protected function _processStore($store)
     {
@@ -180,7 +182,9 @@ USAGE;
     /**
      * Setup customers, products and actions
      *
-     * @param  string $orders the order for given store
+     * @param string $orders the order for given store
+     *
+     * @return void
      */
     private function preparePost($orders)
     {
@@ -198,6 +202,8 @@ USAGE;
      * Sets up cURL request paramaters for adding a customer
      *
      * @param int $customerId Customer ID of loggedin customer
+     *
+     * @return void
      */
     private function _addCustomer($customerId)
     {
@@ -223,8 +229,10 @@ USAGE;
      * Sets up cURL request paramaters for adding a parent
      * item of ordered product (Since Upsells can only be shown on parents)
      *
-     * @param int $productid  Product ID of purchased item
+     * @param int $products   Product ID of purchased item
      * @param int $customerId Customer ID of loggedin customer
+     *
+     * @return void
      */
     private function _addItems($products, $customerId)
     {
@@ -267,8 +275,10 @@ USAGE;
     /**
      * Sets up cURL request paramaters for adding a user-to-item action
      *
-     * @param int $productid  Product ID of item to action
+     * @param int $_productId Product ID of item to action
      * @param int $customerId Customer ID of loggedin customer
+     *
+     * @return void
      */
     private function _addAction($_productId, $customerId)
     {
