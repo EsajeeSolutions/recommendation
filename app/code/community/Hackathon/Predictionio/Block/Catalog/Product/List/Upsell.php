@@ -18,7 +18,7 @@ class Hackathon_Predictionio_Block_Catalog_Product_List_Upsell extends Mage_Cata
 	 */
 	protected function _prepareData()
     {
-    	$_helper = Mage::helper('similarproducts');
+    	$_helper = Mage::helper('predictionio');
     	$product = Mage::registry('product');
 
     	if ($_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
