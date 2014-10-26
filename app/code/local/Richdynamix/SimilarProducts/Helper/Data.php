@@ -14,42 +14,31 @@ class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
 	const PREDICTION_QUERY_API_ENDPOINT = 'queries.json';
 	const DATE_TIME_FORMAT = DateTime::ISO8601;
 
-
-	/**
-	 * API Endpoint for users
-	 * @var string
-	 */
-	protected $_userUrl = 'events.json';
-
-	/**
-	 * API Endpoint for items
-	 * @var string
-	 */
-	protected $_itemsUrl = 'events.json';
-
-	/**
-	 * API Endpoint for users-to-item actions
-	 * @var string
-	 */
-	protected $_actionsUrl = 'events.json';
-
-	/**
-	 * API Endpoint for similarity engine.
-	 * {engine} will be string replaced by the engine name
-	 * you specify in the CMS configuration
-	 * @var string
-	 */
-	protected $_engineUrl = 'engines/itemsim/{engine}/topn.json';
-
 	/**
 	 * Sets up cURL request paramaters for adding a customer
 	 * @param int $customerId Customer ID of loggedin customer
 	 */
 	public function _addCustomer($customerId) {
+		$eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
+		$properties = array();
+		if (empty($properties)) {
+			$properties = (object) $properties;
+		}
+		$json = json_encode(
+			[
+				'event'      => '$set',
+				'entityType' => 'pio_user',
+				'entityId'   => $customerId,
+				'appId'      => (int) $this->_helper->getEngineKey(),
+				'properties' => $properties,
+				'eventTime'  => $eventTime,
+			]
+		);
 
-		$fields_string = 'pio_appkey='.$this->getEngineKey().'&';
-		$fields_string .= 'pio_uid='.$customerId;
-		$this->sendData($this->getApiHost().':'.$this->getApiPort().'/'.$this->_userUrl, $fields_string);
+		$this->sendData(
+			$this->getApiHost().':'.$this->getApiPort().'/'.
+			self::PREDICTION_INDEX_API_ENDPOINT,
+			$json);
 	}
 
 	/**

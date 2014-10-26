@@ -7,7 +7,7 @@
 class Richdynamix_SimilarProducts_Model_Prediction extends Mage_Core_Model_Abstract
 {
 	/**
-	 * Get a specific amount ofrecommended products for the user
+	 * Get a specific amount of recommended products for the user
 	 *
 	 * @param int $customerId
 	 * @param int $numProducts
