@@ -7,7 +7,7 @@
  */
 
 require_once Mage::getModuleDir('controllers', 'Mage_Review').DS.'ProductController.php';
-class Richdynamix_SimilarProducts_Frontend_Review_ProductController extends Mage_Review_ProductController
+class Hackathon_Predictionio_Frontend_Review_ProductController extends Mage_Review_ProductController
 {
     /**
      * Action list where need check enabled cookie

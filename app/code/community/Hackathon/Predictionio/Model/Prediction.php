@@ -3,7 +3,7 @@
 /**
  * Class Richdynamix_SimilarProducts_Model_Prediction
  */
-class Richdynamix_SimilarProducts_Model_Prediction extends Mage_Core_Model_Abstract
+class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 {
     private $_helper = null;
 	/**

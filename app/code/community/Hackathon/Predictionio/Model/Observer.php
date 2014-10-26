@@ -8,7 +8,7 @@
  * @author 		Steven Richardson (steven@richdynamix.com) @troongizmo
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Richdynamix_SimilarProducts_Model_Observer
+class Hackathon_Predictionio_Model_Observer
 {
 
 	/**
