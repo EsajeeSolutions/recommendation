@@ -227,7 +227,7 @@ USAGE;
         );
         $this->_model->postRequest(
             $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_API_ENDPOINT,
+            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
     }
@@ -281,7 +281,7 @@ USAGE;
 
         $this->_model->postRequest(
             $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_API_ENDPOINT,
+            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
         $this->_addAction($_productId, $customerId);
@@ -320,7 +320,7 @@ USAGE;
         );
         $this->_model->postRequest(
             $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_API_ENDPOINT,
+            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
     }
