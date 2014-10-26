@@ -1,275 +1,300 @@
 <?php
+
 /**
- *	Helper class for Similarity module
- *	handling most data transactions via cURL
- *	
- * @category    Richdynamix
- * @package     Richdynamix_SimilarProducts
- * @author 		Steven Richardson (steven@richdynamix.com) @troongizmo
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *    Helper class for Similarity module
+ *    handling most data transactions via cURL
+ *
+ * @category      Richdynamix
+ * @package       Richdynamix_SimilarProducts
+ * @author        Steven Richardson (steven@richdynamix.com) @troongizmo
+ * @license       http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Richdynamix_SimilarProducts_Helper_Data extends Mage_Core_Helper_Abstract
 {
-	const PREDICTION_INDEX_API_ENDPOINT = 'events.json';
-	const PREDICTION_QUERY_API_ENDPOINT = 'queries.json';
-	const DATE_TIME_FORMAT = DateTime::ISO8601;
+    const PREDICTION_INDEX_API_ENDPOINT = 'events.json';
+    const PREDICTION_QUERY_API_ENDPOINT = 'queries.json';
+    const DATE_TIME_FORMAT = DateTime::ISO8601;
 
-	/**
-	 * Sets up cURL request paramaters for adding a customer
-	 * @param int $customerId Customer ID of loggedin customer
-	 */
-	public function _addCustomer($customerId) {
-		$eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
-		$properties = array();
-		if (empty($properties)) {
-			$properties = (object) $properties;
-		}
-		$json = json_encode(
-			[
-				'event'      => '$set',
-				'entityType' => 'pio_user',
-				'entityId'   => $customerId,
-				'appId'      => (int) $this->_helper->getEngineKey(),
-				'properties' => $properties,
-				'eventTime'  => $eventTime,
-			]
-		);
+    private $refactor_model = null;
 
-		$this->sendData(
-			$this->getApiHost().':'.$this->getApiPort().'/'.
-			self::PREDICTION_INDEX_API_ENDPOINT,
-			$json);
-	}
+    public function __construct()
+    {
+        $this->refactor_model = Mage::getModel('similarproducts/prediction');
+    }
 
-	/**
-	 * Sets up cURL request paramaters for adding a product
-	 * @param Mage_Catalog_Model_Product $product  Instance of Product Model
-	 */
-	public function _addItem(Mage_Catalog_Model_Product $product) {
+    /**
+     * Sets up cURL request paramaters for adding a customer
+     *
+     * @param int $customerId Customer ID of loggedin customer
+     */
+    public function _addCustomer($customerId)
+    {
+        $this->refactor_model->_addCustomer($customerId);
+    }
 
-		$cats = $this->getCategories($product);
-		$fields_string = 'pio_appkey='.$this->getEngineKey().'&';
-		$fields_string .= 'pio_iid='.$product->getId().'&';
-		$fields_string .= 'pio_itypes='.$cats;
-		$this->sendData($this->getApiHost().':'.$this->getApiPort().'/'.$this->_itemsUrl, $fields_string);
-	}
+    /**
+     * Sets up cURL request paramaters for adding a product
+     *
+     * @param Mage_Catalog_Model_Product $product Instance of Product Model
+     */
+    public function _addItem(Mage_Catalog_Model_Product $product)
+    {
 
-	/**
-	 * Sets up cURL request paramaters for adding a parent 
-	 * item of ordered product (Since Upsells can only be shown on parents)
-	 * @param int $productid  Product ID of purchased item
-	 */
-	public function _addItems($productid) {
+        $cats          = $this->getCategories($product);
+        $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
+        $fields_string .= 'pio_iid=' . $product->getId() . '&';
+        $fields_string .= 'pio_itypes=' . $cats;
+        $this->sendData($this->getApiHost() . ':' . $this->getApiPort() . '/' . $this->_itemsUrl, $fields_string);
+    }
 
-		$product = Mage::getModel('catalog/product')->load($productid);
-		$cats = $this->getCategories($product);
-		if($product->getTypeId() == "simple"){
-		    $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
-		    if(!$parentIds)
-		        $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-		    if(isset($parentIds[0])){
-		    	$_productId = $parentIds[0];
-		    } else {
-		    	$_productId = $product->getId();
-		    }
-		}
+    /**
+     * Sets up cURL request paramaters for adding a parent
+     * item of ordered product (Since Upsells can only be shown on parents)
+     *
+     * @param int $productid Product ID of purchased item
+     */
+    public function _addItems($productid)
+    {
 
-		$fields_string = 'pio_appkey='.$this->getEngineKey().'&';
-		$fields_string .= 'pio_iid='.$_productId.'&';
-		$fields_string .= 'pio_itypes='.$cats;
-		$this->sendData($this->getApiHost().':'.$this->getApiPort().'/'.$this->_itemsUrl, $fields_string);
+        $product = Mage::getModel('catalog/product')->load($productid);
+        $cats    = $this->getCategories($product);
+        if ($product->getTypeId() == "simple") {
+            $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
+            if (!$parentIds)
+                $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+            if (isset($parentIds[0])) {
+                $_productId = $parentIds[0];
+            } else {
+                $_productId = $product->getId();
+            }
+        }
 
-	}
-	
-	/**
-	 * Sets up cURL request paramaters for adding a user-to-item action
-	 * @param int $productid  Product ID of item to action
-	 * @param int $customerId Customer ID of loggedin customer
-	 */
-	public function _addAction($productId, $customerId, $action, $rate = null) {
+        $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
+        $fields_string .= 'pio_iid=' . $_productId . '&';
+        $fields_string .= 'pio_itypes=' . $cats;
+        $this->sendData($this->getApiHost() . ':' . $this->getApiPort() . '/' . $this->_itemsUrl, $fields_string);
 
-		$fields_string = 'pio_appkey='.$this->getEngineKey().'&';
-		$fields_string .= 'pio_uid='.$customerId.'&';
-		$fields_string .= 'pio_iid='.$productId.'&';
-		if ($rate != null) {
-			$fields_string .= 'pio_rate='.$rate.'&';	
-		}
-		$fields_string .= 'pio_action='.$action;
-		$this->sendData($this->getApiHost().':'.$this->getApiPort().'/'.$this->_actionsUrl, $fields_string);
-	}
+    }
 
-	/**
-	 * Gets comma seperated list of categories 
-	 * belonging to product, used for pio_itypes in PredictionIO
-	 * @param  Mage_Catalog_Model_Product $product Instance of Product Model
-	 * @return string  Comma seperated categories
-	 */
-	public function getCategories(Mage_Catalog_Model_Product $product) {
-		
-		if ($product->getId()) {
-			$categoryIds = $product->getCategoryIds();
-			if (is_array($categoryIds) and count($categoryIds) >= 1) {
-				$catsString = '';
-				foreach ($categoryIds as $id) {
-					$cat = Mage::getModel('catalog/category')->load($id);
-					$catsString .= $cat->getName().',';
-				}
-				$cats = rtrim($catsString, ",");
-				return $cats;
-			}
-			return '';
-		}
-	}
+    /**
+     * Sets up cURL request paramaters for adding a user-to-item action
+     *
+     * @param int $productid  Product ID of item to action
+     * @param int $customerId Customer ID of loggedin customer
+     */
+    public function _addAction($productId, $customerId, $action, $rate = null)
+    {
 
-	/**
-	 * Sets up cURL request paramaters for getting similar products
-	 * from PredictionIO after data is trained
-	 * @param  Mage_Catalog_Model_Product $product Instance of Product Model
-	 * @return mixed (Array of product ID's or NULL when empty)
-	 */
-	public function getSimilarProducts (Mage_Catalog_Model_Product $product)
-	{
-		
-		$engineUrl = str_replace('{engine}', $this->getEngineName(), $this->_engineUrl);
+        $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
+        $fields_string .= 'pio_uid=' . $customerId . '&';
+        $fields_string .= 'pio_iid=' . $productId . '&';
+        if ($rate != null) {
+            $fields_string .= 'pio_rate=' . $rate . '&';
+        }
+        $fields_string .= 'pio_action=' . $action;
+        $this->sendData($this->getApiHost() . ':' . $this->getApiPort() . '/' . $this->_actionsUrl, $fields_string);
+    }
 
-		$_currentProduct = 'pio_iid='.$product->getId();
+    /**
+     * Gets comma seperated list of categories
+     * belonging to product, used for pio_itypes in PredictionIO
+     *
+     * @param  Mage_Catalog_Model_Product $product Instance of Product Model
+     *
+     * @return string  Comma seperated categories
+     */
+    public function getCategories(Mage_Catalog_Model_Product $product)
+    {
 
-		$_maxProductCount = 'pio_n='.$this->getProductCount();
-		$_key = 'pio_appkey='.$this->getEngineKey();
+        if ($product->getId()) {
+            $categoryIds = $product->getCategoryIds();
+            if (is_array($categoryIds) and count($categoryIds) >= 1) {
+                $catsString = '';
+                foreach ($categoryIds as $id) {
+                    $cat = Mage::getModel('catalog/category')->load($id);
+                    $catsString .= $cat->getName() . ',';
+                }
+                $cats = rtrim($catsString, ",");
+                return $cats;
+            }
+            return '';
+        }
+    }
 
-		$cats = '';
-		if ($this->isCategoryResults()) {
-			$cats = '&pio_itypes='.$this->getCategories($product);
-		}
+    /**
+     * Sets up cURL request paramaters for getting similar products
+     * from PredictionIO after data is trained
+     *
+     * @param  Mage_Catalog_Model_Product $product Instance of Product Model
+     *
+     * @return mixed (Array of product ID's or NULL when empty)
+     */
+    public function getSimilarProducts(Mage_Catalog_Model_Product $product)
+    {
 
-		$url = $this->getApiHost() . ':' . $this->getApiPort() . '/' . $engineUrl; 
-		$query = '?' . $_currentProduct. '&' . $_maxProductCount. '&' . $_key.$cats;
+        $engineUrl = str_replace('{engine}', $this->getEngineName(), $this->_engineUrl);
 
-		$content = json_decode($this->getData($url, $query));
+        $_currentProduct = 'pio_iid=' . $product->getId();
 
-		if (isset($content->pio_iids)) {
-			return $content->pio_iids;
-		} else {
-			return null;
-		}
-	}
+        $_maxProductCount = 'pio_n=' . $this->getProductCount();
+        $_key             = 'pio_appkey=' . $this->getEngineKey();
 
-	/**
-	 * Perform the cURL GET Request
-	 * @param  string $url   URL of PredictionIO API 
-	 * @param  string $query Query params to get data
-	 * @return string string version of JSON object to be parsed.
-	 */
-	public function getData($url, $query) {
+        $cats = '';
+        if ($this->isCategoryResults()) {
+            $cats = '&pio_itypes=' . $this->getCategories($product);
+        }
 
-		$ch = curl_init();
+        $url   = $this->getApiHost() . ':' . $this->getApiPort() . '/' . $engineUrl;
+        $query = '?' . $_currentProduct . '&' . $_maxProductCount . '&' . $_key . $cats;
 
-		// Set query data here with the URL
-		curl_setopt($ch, CURLOPT_URL, $url . $query); 
+        $content = json_decode($this->getData($url, $query));
 
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_TIMEOUT, '3');
-		
-		$content = trim(curl_exec($ch));
+        if (isset($content->pio_iids)) {
+            return $content->pio_iids;
+        } else {
+            return null;
+        }
+    }
 
-		curl_close($ch);
+    /**
+     * Perform the cURL GET Request
+     *
+     * @param  string $url   URL of PredictionIO API
+     * @param  string $query Query params to get data
+     *
+     * @return string string version of JSON object to be parsed.
+     */
+    public function getData($url, $query)
+    {
 
-		return $content;
-	}
+        $ch = curl_init();
 
-	/**
-	 * Perform the cURL POST Request
-	 * @param  string $url   URL of PredictionIO API 
-	 * @param  string $fields_string Query params for POST data
-	 */
-	public function sendData($url, $fields_string) {
-		//open connection
-		$ch = curl_init();
+        // Set query data here with the URL
+        curl_setopt($ch, CURLOPT_URL, $url . $query);
 
-		//set the url, number of POST vars, POST data
-		curl_setopt($ch,CURLOPT_URL, $url);
-		curl_setopt($ch,CURLOPT_POST, 1);
-		curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch,CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, '3');
 
-		//execute post
-		$result = curl_exec($ch);
+        $content = trim(curl_exec($ch));
 
-		//close connection
-		curl_close($ch);
-	}
+        curl_close($ch);
 
-	/**
-	 * Similarity Engine Key, Defined in PredictionIO
-	 * @return string 
-	 */
-	public function getEngineKey(){
-		return Mage::getStoreConfig('similarproducts/settings/predict_key');
-	}
+        return $content;
+    }
 
-	/**
-	 * Similarity Engine Name, Defined in PredictionIO
-	 * @return string
-	 */
-	public function getEngineName(){
-		return Mage::getStoreConfig('similarproducts/settings/engine_name');
-	}
+    /**
+     * Perform the cURL POST Request
+     *
+     * @param  string $url           URL of PredictionIO API
+     * @param  string $fields_string Query params for POST data
+     */
+    public function sendData($url, $fields_string)
+    {
+        //open connection
+        $ch = curl_init();
 
-	/**
-	 * PredictionIO URL
-	 * @return string
-	 */
-	public function getApiHost(){
-		return Mage::getStoreConfig('similarproducts/settings/predict_host');
-	}
+        //set the url, number of POST vars, POST data
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
 
-	/**
-	 * PredictionIO API Port, Default is 8000 but needs to be defined
-	 * @return string
-	 */
-	public function getApiPort(){
-		return Mage::getStoreConfig('similarproducts/settings/predict_port');
-	}
+        //execute post
+        $result = curl_exec($ch);
 
-	/**
-	 * PredictionIO API Ranking Port, Default is 9993 but needs to be defined
-	 * @return string
-	 */
-	public function getApiRankingPort(){
-		return Mage::getStoreConfig('similarproducts/settings/predict_ranking_port');
-	}
+        //close connection
+        curl_close($ch);
+    }
 
-	/**
-	 * PredictionIO API Recommendation Port, Default is 9997 but needs to be defined
-	 * @return string
-	 */
-	public function getApiRecommendationPort(){
-		return Mage::getStoreConfig('similarproducts/settings/predict_recommendation_port');
-	}
+    /**
+     * Similarity Engine Key, Defined in PredictionIO
+     *
+     * @return string
+     */
+    public function getEngineKey()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/predict_key');
+    }
 
-	/**
-	 * Module ON/OFF Switch
-	 * @return bool
-	 */
-	public function isEnabled(){
-		return Mage::getStoreConfig('similarproducts/settings/enabled');
-	}
+    /**
+     * Similarity Engine Name, Defined in PredictionIO
+     *
+     * @return string
+     */
+    public function getEngineName()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/engine_name');
+    }
 
-	/**
-	 * Determine if the results should be based on similar categories
-	 * @return bool
-	 */
-	public function isCategoryResults(){
-		return Mage::getStoreConfig('similarproducts/settings/category_results');
-	}
+    /**
+     * PredictionIO URL
+     *
+     * @return string
+     */
+    public function getApiHost()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/predict_host');
+    }
 
-	/**
-	 * Get maximum returned products
-	 * @return int
-	 */
-	public function getProductCount(){
-		return Mage::getStoreConfig('similarproducts/settings/product_count');
-	}
+    /**
+     * PredictionIO API Port, Default is 8000 but needs to be defined
+     *
+     * @return string
+     */
+    public function getApiPort()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/predict_port');
+    }
+
+    /**
+     * PredictionIO API Ranking Port, Default is 9993 but needs to be defined
+     *
+     * @return string
+     */
+    public function getApiRankingPort()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/predict_ranking_port');
+    }
+
+    /**
+     * PredictionIO API Recommendation Port, Default is 9997 but needs to be defined
+     *
+     * @return string
+     */
+    public function getApiRecommendationPort()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/predict_recommendation_port');
+    }
+
+    /**
+     * Module ON/OFF Switch
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/enabled');
+    }
+
+    /**
+     * Determine if the results should be based on similar categories
+     *
+     * @return bool
+     */
+    public function isCategoryResults()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/category_results');
+    }
+
+    /**
+     * Get maximum returned products
+     *
+     * @return int
+     */
+    public function getProductCount()
+    {
+        return Mage::getStoreConfig('similarproducts/settings/product_count');
+    }
 
 }

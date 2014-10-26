@@ -52,29 +52,6 @@ class Richdynamix_Shell_Similarity extends Mage_Shell_Abstract
      */
     protected $_model;
 
-
-    /**
-     * API Endpoint for users
-     *
-     * @var string
-     */
-    protected $_userUrl = 'events.json';
-
-    /**
-     * API Endpoint for items
-     *
-     * @var string
-     */
-    protected $_itemsUrl = 'events.json';
-
-    /**
-     * API Endpoint for users-to-item actions
-     *
-     * @var string
-     */
-    protected $_actionsUrl = 'events.json';
-
-
     /**
      * Setup the run command with the right data to process
      */
@@ -210,26 +187,7 @@ USAGE;
         if (empty($customerId)) {
             return;
         }
-        $eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
-        $properties = array();
-        if (empty($properties)) {
-            $properties = (object) $properties;
-        }
-        $json = json_encode(
-            [
-                'event'      => '$set',
-                'entityType' => 'pio_user',
-                'entityId'   => $customerId,
-                'appId'      => (int) $this->_helper->getEngineKey(),
-                'properties' => $properties,
-                'eventTime'  => $eventTime,
-            ]
-        );
-        $this->_model->postRequest(
-            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
-            $json
-        );
+        $this->_model->_addCustomer($customerId);
     }
 
     /**
@@ -243,49 +201,10 @@ USAGE;
      */
     private function _addItems($products, $customerId)
     {
-
-        foreach ($products as $key => $productid) {
-            $product = Mage::getModel('catalog/product')->load($productid);
-            if ($product->getTypeId() == "simple") {
-                $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
-                if (!$parentIds)
-                    $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-                if (isset($parentIds[0])) {
-                    $_productId = $parentIds[0];
-                } else {
-                    $_productId = $product->getId();
-                }
-            }
-        }
-
-        if (empty($_productId)) {
+        if (empty($products) || empty($customerId)) {
             return;
         }
-
-        $eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
-        $properties = array('pio_itypes' => array('1'));
-        if (empty($properties)) {
-            $properties = (object) $properties;
-        }
-
-        $json = json_encode(
-            [
-            'event'      => '$set',
-            'entityType' => 'pio_item',
-            'entityId'   => $_productId,
-            'appId'      => (int) $this->_helper->getEngineKey(),
-            'properties' => $properties,
-            'eventTime'  => $eventTime,
-            ]
-        );
-
-        $this->_model->postRequest(
-            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
-            $json
-        );
-        $this->_addAction($_productId, $customerId);
-
+        $this->_model->_addItems($products, $customerId);
     }
 
     /**
@@ -301,28 +220,7 @@ USAGE;
         if (empty($_productId) || empty($customerId)) {
             return;
         }
-        $eventTime  = (new \DateTime())->format(DateTime::ISO8601);
-        $properties = array();
-        if (empty($properties)) {
-            $properties = (object) $properties;
-        }
-        $json = json_encode(
-            [
-            'event'            => 'conversion',
-            'entityType'       => 'pio_user',
-            'entityId'         => $customerId,
-            'targetEntityType' => 'pio_item',
-            'targetEntityId'   => $_productId,
-            'appId'            => (int) $this->_helper->getEngineKey(),
-            'properties'       => $properties,
-            'eventTime'        => $eventTime,
-            ]
-        );
-        $this->_model->postRequest(
-            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
-            Richdynamix_SimilarProducts_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
-            $json
-        );
+        $this->_model->_addAction($_productId, $customerId);
     }
 
 }
