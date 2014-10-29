@@ -1,0 +1,5 @@
+/.idea/
+.DS_Store
+Zone.Identifier
+*.iml
+/atlassian-ide-plugin.xml
