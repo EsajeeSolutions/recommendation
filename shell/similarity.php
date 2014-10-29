@@ -61,8 +61,8 @@ class Hackathon_Shell_Prediction extends Mage_Shell_Abstract
 
         set_time_limit(0);
 
-        $this->_helper = Mage::helper('similarproducts');
-        $this->_model  = Mage::getModel('similarproducts/prediction');
+        $this->_helper = Mage::helper('predictionio');
+        $this->_model  = Mage::getModel('predictionio/prediction');
 
 
         if ($this->getArg('stores')) {
@@ -225,5 +225,5 @@ USAGE;
 
 }
 
-$shell = new Richdynamix_Shell_Similarity();
+$shell = new Hackathon_Shell_Prediction();
 $shell->run();

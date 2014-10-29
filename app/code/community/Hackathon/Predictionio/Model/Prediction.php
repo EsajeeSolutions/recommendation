@@ -21,7 +21,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 		);
 
 		$result = json_decode($this->postRequest(
-            $this->getApiHost() . ':' . $this->getApiRecommendationPort() . '/' .
+            $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
             Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
             $json
         ));
@@ -57,7 +57,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      */
     public function _addCustomer($customerId)
     {
-        $eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
+        $eventTime  = (new DateTime('NOW'))->format(Hackathon_Predictionio_Helper_Data::DATE_TIME_FORMAT);
         $properties = array();
         if (empty($properties)) {
             $properties = (object) $properties;
@@ -74,8 +74,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         );
 
         $this->postRequest(
-            $this->getApiHost() . ':' . $this->getApiPort() . '/' .
-            self::PREDICTION_INDEX_API_ENDPOINT,
+            $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiPort() . '/' .
+            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
     }
@@ -109,7 +109,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
             return false;
         }
 
-        $eventTime  = (new DateTime('NOW'))->format(self::DATE_TIME_FORMAT);
+        $eventTime  = (new DateTime('NOW'))->format(Hackathon_Predictionio_Helper_Data::DATE_TIME_FORMAT);
         $properties = array('pio_itypes' => array('1'));
         if (empty($properties)) {
             $properties = (object) $properties;
@@ -127,7 +127,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         );
 
         $this->postRequest(
-            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
+            $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiPort() . '/' .
             Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
@@ -161,13 +161,13 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                 'entityId'         => $customerId,
                 'targetEntityType' => 'pio_item',
                 'targetEntityId'   => $_productId,
-                'appId'            => (int) $this->_helper->getEngineKey(),
+                'appId'            => (int) $this->getHelper()->getEngineKey(),
                 'properties'       => $properties,
                 'eventTime'        => $eventTime,
             ]
         );
-        $this->_model->postRequest(
-            $this->_helper->getApiHost() . ':' . $this->_helper->getApiPort() . '/' .
+        $this->postRequest(
+            $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiPort() . '/' .
             Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
             $json
         );
@@ -181,7 +181,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
     public function getHelper()
     {
         if (empty($this->_helper)) {
-            Mage::helper('similarproducts/data');
+            return $this->_helper = Mage::helper('predictionio/data');
         } else {
             return $this->_helper;
         }
