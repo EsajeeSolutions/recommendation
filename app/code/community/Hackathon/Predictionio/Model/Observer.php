@@ -36,15 +36,18 @@ class Hackathon_Predictionio_Model_Observer
      * products. We log items to the session then extract later
      * when they login.
      *
-     * @param  string                     $action  Define the action to watch
-     * @param  Mage_Catalog_Model_Product $product [description]
+     * @param string                     $action  Define the action to watch
+     * @param Mage_Catalog_Model_Product $product [description]
+     * @param integer                    $rating  rating
+     *
+     * @return void
      */
     public function logGuestActions($action, Mage_Catalog_Model_Product $product, $rating = null)
     {
 
         $guestActions = Mage::getSingleton('core/session')->getGuestActions();
 
-        if (isset($guestActions) && $guestActions != NULL) {
+        if (isset($guestActions) && $guestActions != null) {
             if ($action === 'view') {
                 array_push($guestActions['product_view'], $product->getId());
             }
@@ -73,6 +76,8 @@ class Hackathon_Predictionio_Model_Observer
      * Event to fire when the customer logs in
      *
      * @param Varien_Event_Observer $observer customer_login
+     *
+     * @return void
      */
     public function addCustomer(Varien_Event_Observer $observer)
     {
@@ -95,6 +100,8 @@ class Hackathon_Predictionio_Model_Observer
      *
      * @param string $guestActions type of action being defined
      * @param int    $customerId   Customer ID of logged in customer
+     *
+     * @return void
      */
     protected function processGuestActions($guestActions, $customerId)
     {
@@ -118,7 +125,9 @@ class Hackathon_Predictionio_Model_Observer
     /**
      * Event to fire when the customer views a product
      *
-     * @param  Varien_Event_Observer $observer [description]
+     * @param Varien_Event_Observer $observer [description]
+     *
+     * @return void
      */
     public function productView(Varien_Event_Observer $observer)
     {
@@ -136,7 +145,9 @@ class Hackathon_Predictionio_Model_Observer
     /**
      * Event to fire when the customer reviews a product
      *
-     * @param  Varien_Event_Observer $observer [description]
+     * @param Varien_Event_Observer $observer [description]
+     *
+     * @return void
      */
     public function productRate(Varien_Event_Observer $observer)
     {
@@ -166,7 +177,9 @@ class Hackathon_Predictionio_Model_Observer
     /**
      * Event to fire when the customer buys a product
      *
-     * @param  Varien_Event_Observer $observer [description]
+     * @param Varien_Event_Observer $observer [description]
+     *
+     * @return void
      */
     public function productSale(Varien_Event_Observer $observer)
     {
@@ -177,7 +190,7 @@ class Hackathon_Predictionio_Model_Observer
             $items = $order->getItemsCollection();
 
             foreach ($items as $item) {
-                $this->_model->_addItems($item->getProductId());
+                $this->_model->_addItem($item->getProductId());
                 $this->_model->_addAction($item->getProductId(), $customer->getId(), 'conversion');
             }
         }
