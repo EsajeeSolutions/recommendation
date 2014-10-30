@@ -1,13 +1,11 @@
-Similar Products for Magento
+PredictionIO (Similar Products, Recommendations) for Magento
 =============
 
-Magento Upsell Product Enhancement with PredictionIO
+Magento Upsell Product Enhancement, Recommendation with PredictionIO 0.8
 
 ## Install
 
-Clone the git repo - `git clone git://github.com/richdynamix/Similar-Products.git` - or https://github.com/richdynamix/Similar-Products/archive/master.zip
-
-Once downloaded copy the contents (app) folders to your project root merging with your existing magento installation.
+Clone the git repo - modman clone https://github.com/magento-hackathon/Predictionio.git
 
 ### Requirements
 
