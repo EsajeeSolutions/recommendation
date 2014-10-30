@@ -1,15 +1,9 @@
 <?xml version="1.0"?>
 <config>
-  <tabs>
-	<richdynamix translate="label" module="similarproducts">
-        <label>RichDynamix</label>
-        <sort_order>0</sort_order>
-    </richdynamix>
-  </tabs>
   <sections>
-	<similarproducts  translate="label" module="similarproducts">                    
-	<label>Similar Products</label>
-	<tab>richdynamix</tab>
+	<predictionio  translate="label" module="predictionio">
+	<label>PredictionIO</label>
+	<tab>catalog</tab>
 	<frontend_type>text</frontend_type>
 	<sort_order>0</sort_order>
 	<show_in_default>1</show_in_default>
@@ -107,6 +101,6 @@
 	   </fields>
 	   </settings>
 	</groups>
-	</similarproducts>
+	</predictionio>
   </sections>
 </config>

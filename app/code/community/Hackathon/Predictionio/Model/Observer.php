@@ -27,7 +27,7 @@ class Hackathon_Predictionio_Model_Observer
     public function __construct()
     {
         $this->_model = Mage::getModel('predictionio/prediction');
-        $this->_helper = Mage::helpers('predictionio');
+        $this->_helper = Mage::helper('predictionio');
     }
 
     /**

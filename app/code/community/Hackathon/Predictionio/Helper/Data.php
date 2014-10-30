@@ -19,7 +19,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function __construct()
     {
-        $this->refactor_model = Mage::getModel('similarproducts/prediction');
+        $this->refactor_model = Mage::getModel('predictionio/prediction');
     }
 
     /**
@@ -212,7 +212,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getEngineKey()
     {
-        return Mage::getStoreConfig('similarproducts/settings/predict_key');
+        return Mage::getStoreConfig('predictionio/settings/predict_key');
     }
 
     /**
@@ -222,7 +222,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getEngineName()
     {
-        return Mage::getStoreConfig('similarproducts/settings/engine_name');
+        return Mage::getStoreConfig('predictionio/settings/engine_name');
     }
 
     /**
@@ -232,7 +232,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiHost()
     {
-        return Mage::getStoreConfig('similarproducts/settings/predict_host');
+        return Mage::getStoreConfig('predictionio/settings/predict_host');
     }
 
     /**
@@ -242,7 +242,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiPort()
     {
-        return Mage::getStoreConfig('similarproducts/settings/predict_port');
+        return Mage::getStoreConfig('predictionio/settings/predict_port');
     }
 
     /**
@@ -252,7 +252,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiRankingPort()
     {
-        return Mage::getStoreConfig('similarproducts/settings/predict_ranking_port');
+        return Mage::getStoreConfig('predictionio/settings/predict_ranking_port');
     }
 
     /**
@@ -262,7 +262,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiRecommendationPort()
     {
-        return Mage::getStoreConfig('similarproducts/settings/predict_recommendation_port');
+        return Mage::getStoreConfig('predictionio/settings/predict_recommendation_port');
     }
 
     /**
@@ -272,7 +272,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isEnabled()
     {
-        return Mage::getStoreConfig('similarproducts/settings/enabled');
+        return Mage::getStoreConfig('predictionio/settings/enabled');
     }
 
     /**
@@ -282,7 +282,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCategoryResults()
     {
-        return Mage::getStoreConfig('similarproducts/settings/category_results');
+        return Mage::getStoreConfig('predictionio/settings/category_results');
     }
 
     /**
@@ -292,7 +292,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getProductCount()
     {
-        return Mage::getStoreConfig('similarproducts/settings/product_count');
+        return Mage::getStoreConfig('predictionio/settings/product_count');
     }
 
 }
