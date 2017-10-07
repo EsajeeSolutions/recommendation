@@ -143,16 +143,31 @@ USAGE;
         printf('Processing "%s" store' . "\n", $storeName);
         $this->_sCount++;
         Mage::app()->setCurrentStore($store->getId());
-        $salesModel      = Mage::getModel("sales/order");
-        $salesCollection = $salesModel->getCollection();
-        foreach ($salesCollection as $order) {
-            if ($order->getCustomerId()) {
-                $_order[$order->getIncrementId()]['customer'][$order->getCustomerId()] = array();
-                foreach ($order->getAllItems() as $item) {
-                    $_order[$order->getIncrementId()]['customer'][$order->getCustomerId()]['items'][] = $item->getProductId();
-                }
-            }
-        }
+	$salesModel      = Mage::getModel("sales/order");
+	// we better limit collection size to avoid memory issues
+	// and read it page by page
+	$salesCollection = $salesModel->getCollection();
+	$salesCollection->setPageSize(100);
+	$pages = $salesCollection->getLastPageNumber();
+        $currentPage = 1;
+
+        do {
+		$salesCollection->setCurPage($currentPage);
+		printf('Processing page %s out of %s pages' . "\r", $currentPage, $pages);
+		$salesCollection->load();
+
+	        foreach ($salesCollection as $order) {
+        	    if ($order->getCustomerId()) {
+                	$_order[$order->getIncrementId()]['customer'][$order->getCustomerId()] = array();
+	                foreach ($order->getAllItems() as $item) {
+        	            $_order[$order->getIncrementId()]['customer'][$order->getCustomerId()]['items'][] = $item->getProductId();
+                	}
+	            }
+		}
+
+	        $currentPage++;
+		$salesCollection->clear();
+        } while ($currentPage <= $pages);
         $this->preparePost($_order);
     }
 
