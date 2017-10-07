@@ -50,7 +50,7 @@ Sometimes customers don't login till they get to the checkout so we log the cust
 
 Using the shell script included you can import all exiting sales data i.e Customers, Products and the action of conversion to kick start your data feeds. Just run the following command from your web root- 
 
-``php shell/similarity.php --store store1,store2``
+``php shell/similarity.php --stores store1,store2``
 
 Where --store looks for a comma seperated list of store names to import from. If you don't supply `--store` then all stores in your Magento installation will be imported.
 
