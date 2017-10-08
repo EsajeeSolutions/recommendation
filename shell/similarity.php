@@ -169,7 +169,7 @@ USAGE;
 		$salesCollection->clear();
 	} while ($currentPage <= $pages);
         // to give space after previous printf
-        printf('\n');
+        echo "\n";
         $this->preparePost($_order);
     }
 
@@ -182,14 +182,22 @@ USAGE;
      */
     private function preparePost($orders)
     {
+        $n = count($orders);
+        $curr_n = 1;
         foreach ($orders as $order) {
+
+            printf('Processing order %s out of %s orders.' . "\r", $curr_n, $n);
+
             foreach ($order['customer'] as $key => $items) {
                 $customerId = $key;
                 $products   = $items['items'];
             }
             $this->_addCustomer($customerId);
-            $this->_addItems($products, $customerId);
+            $this->_addOrder($products, $customerId, 'purchase');
+
+	    $curr_n++;
         }
+	echo "\n";
     }
 
     /**
@@ -216,12 +224,12 @@ USAGE;
      *
      * @return void
      */
-    private function _addItems($products, $customerId)
+    private function _addOrder($products, $customerId, $action)
     {
         if (empty($products) || empty($customerId)) {
             return;
         }
-        $this->_model->_addItems($products, $customerId);
+	$this->_model->_addOrder($products, $customerId, $action);
     }
 
     /**
