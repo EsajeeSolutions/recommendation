@@ -167,7 +167,9 @@ USAGE;
 
 	        $currentPage++;
 		$salesCollection->clear();
-        } while ($currentPage <= $pages);
+	} while ($currentPage <= $pages);
+        // to give space after previous printf
+        printf('\n');
         $this->preparePost($_order);
     }
 

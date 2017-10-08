@@ -132,7 +132,7 @@ class Hackathon_Predictionio_Model_Observer
     public function productView(Varien_Event_Observer $observer)
     {
 
-        if ($this->_model->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
+        if ($this->_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
             $product  = Mage::registry('current_product');
             $customer = Mage::getSingleton('customer/session')->getCustomer();
             $this->_model->_addItem($product);
