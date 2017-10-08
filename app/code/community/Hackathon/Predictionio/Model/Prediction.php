@@ -108,17 +108,20 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                     $_productId = $product->getId();
                 }
 	    }
-
-	    $this->_addItem($_productId, $customerId);
+        // if type is not simple or something else is going on
+            if (!isset($_productId)) {
+                $_productId = $productid;
+            }
+	    $this->_addItem($_productId);
 	    $this->_addAction($_productId, $customerId, $action);
 
         }
 
     }
 
-    public function _addItem($productId, $customerId)
+    public function _addItem($productId)
     {
-        if (empty($productId) || empty($customerId)) {
+        if (empty($productId)) {
             return false;
         }
 	// doing this second time, probably not wise TODO better
