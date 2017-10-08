@@ -138,8 +138,6 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
             $json
         );
 
-        $this->_addAction($_productId, $customerId);
-
     }
 
     /**
@@ -176,9 +174,9 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      *
      * @return void
      */
-    public function _addAction($_productId, $customerId)
+    public function _addAction($_productId, $customerId, $action)
     {
-        if (empty($_productId) || empty($customerId)) {
+        if (empty($_productId) || empty($customerId) || empty($action)) {
             return;
         }
         $eventTime  = (new \DateTime())->format(DateTime::ISO8601);
@@ -188,7 +186,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         }
         $json = json_encode(
             [
-                'event'            => 'purchase',
+                'event'            => $action,
                 'entityType'       => 'user',
                 'entityId'         => $customerId,
                 'targetEntityType' => 'item',
