@@ -12,20 +12,20 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 	 * @param int $customerId
 	 * @param int $numProducts
 	 */
-	public function getRecommendedProducts($customerId, $numProducts) {
-		$json = json_encode(
-			[
-				'uid'	=> $customerId,
-				'n'		=> $numProducts
-			]
-		);
+    public function getRecommendedProducts($customerId, $numProducts) {
+	$json = json_encode(
+		[
+			'uid'	=> $customerId,
+			'n'	=> $numProducts
+		]
+	);
 
-		$result = json_decode($this->postRequest(
-            $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
-            Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
-            $json
+	$result = json_decode($this->postRequest(
+		$this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
+		Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
+		$json
         ));
-	}
+    }
 
     /**
      * Perform the POST Request
@@ -44,9 +44,15 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                 'timeout'      => 1)
         );
         $client->setRawData($json, 'application/json')->request('POST');
-        $status = $client->getLastResponse();
-        if ($status->getStatus() == 400) { // log bad request
-            Mage::log("Prediction postRequest BadRequest " . $json);
+	$status = $client->getLastResponse();
+       
+        Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
+        Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
+        Mage::log('Status: ' . $status . "\n", null, 'predictionio.log');
+        Mage::log('Status code: ' . $status->getStatus() . "\n", null, 'predictionio.log');
+
+	if ($status->getStatus() == 400) { // log bad request
+		Mage::log("Prediction/postRequest/BadRequest " . $json, null, 'predictionio.log');
         };
     }
 
@@ -65,9 +71,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         $json = json_encode(
             [
                 'event'      => '$set',
-                'entityType' => 'pio_user',
+                'entityType' => 'user',
                 'entityId'   => $customerId,
-                'appId'      => (int) $this->getHelper()->getEngineKey(),
                 'properties' => $properties,
                 'eventTime'  => $eventTime,
             ]
@@ -75,7 +80,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 
         $this->postRequest(
             $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiPort() . '/' .
-            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
+            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT . '?accessKey=' . $this->getHelper()->getEngineKey(),
             $json
         );
     }
@@ -89,7 +94,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      *
      * @return void
      */
-    public  function _addItems($products, $customerId)
+    public function _addItems($products, $customerId)
     {
         foreach ($products as $key => $productid) {
             $product = Mage::getModel('catalog/product')->load($productid);
@@ -109,8 +114,10 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
             return false;
         }
 
-        $eventTime  = (new DateTime('NOW'))->format(Hackathon_Predictionio_Helper_Data::DATE_TIME_FORMAT);
-        $properties = array('pio_itypes' => array('1'));
+	$eventTime  = (new DateTime('NOW'))->format(Hackathon_Predictionio_Helper_Data::DATE_TIME_FORMAT);
+	$cats    = $this->getCategories($product);
+	// replaced 4 next lines with cats
+        $properties = array('category' => explode(",", $cats));
         if (empty($properties)) {
             $properties = (object) $properties;
         }
@@ -118,9 +125,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         $json = json_encode(
             [
                 'event'      => '$set',
-                'entityType' => 'pio_item',
+                'entityType' => 'item',
                 'entityId'   => $_productId,
-                'appId'      => (int) $this->getHelper()->getEngineKey(),
                 'properties' => $properties,
                 'eventTime'  => $eventTime,
             ]
@@ -128,12 +134,38 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 
         $this->postRequest(
             $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiPort() . '/' .
-            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
+            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT . '?accessKey=' . $this->getHelper()->getEngineKey(),
             $json
         );
 
         $this->_addAction($_productId, $customerId);
 
+    }
+
+    /**
+     * Gets comma seperated list of categories
+     * belonging to product, used for pio_itypes in PredictionIO
+     *
+     * @param  Mage_Catalog_Model_Product $product Instance of Product Model
+     *
+     * @return string  Comma seperated categories
+     */
+    public function getCategories(Mage_Catalog_Model_Product $product)
+    {
+
+        if ($product->getId()) {
+            $categoryIds = $product->getCategoryIds();
+            if (is_array($categoryIds) and count($categoryIds) >= 1) {
+                $catsString = '';
+                foreach ($categoryIds as $id) {
+                    $cat = Mage::getModel('catalog/category')->load($id);
+                    $catsString .= $cat->getName() . ',';
+                }
+                $cats = rtrim($catsString, ",");
+                return $cats;
+            }
+            return '';
+        }
     }
 
     /**
@@ -156,19 +188,18 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         }
         $json = json_encode(
             [
-                'event'            => 'conversion',
-                'entityType'       => 'pio_user',
+                'event'            => 'purchase',
+                'entityType'       => 'user',
                 'entityId'         => $customerId,
-                'targetEntityType' => 'pio_item',
+                'targetEntityType' => 'item',
                 'targetEntityId'   => $_productId,
-                'appId'            => (int) $this->getHelper()->getEngineKey(),
                 'properties'       => $properties,
                 'eventTime'        => $eventTime,
             ]
         );
         $this->postRequest(
             $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiPort() . '/' .
-            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT,
+            Hackathon_Predictionio_Helper_Data::PREDICTION_INDEX_API_ENDPOINT . '?accessKey=' . $this->getHelper()->getEngineKey(),
             $json
         );
     }
