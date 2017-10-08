@@ -108,14 +108,14 @@ class Hackathon_Predictionio_Model_Observer
         if (isset($guestActions['product_view'])) {
             foreach ($guestActions['product_view'] as $item) {
                 $product = Mage::getModel('catalog/product')->load($item);
-                $this->_model->_addItem($product);
+                $this->_model->_addItem($product->getId());
                 $this->_model->_addAction($product->getId(), $customerId, 'view');
             }
         }
         if (isset($guestActions['product_rate'])) {
             foreach ($guestActions['product_rate'] as $product_id => $rating) {
                 $product = Mage::getModel('catalog/product')->load($product_id);
-                $this->_model->_addItem($product);
+                $this->_model->_addItem($product->getId());
 //                $this->_model->_addAction($product_id, $customerId, 'rate', $rating);
             }
         }
@@ -135,7 +135,7 @@ class Hackathon_Predictionio_Model_Observer
         if ($this->_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
             $product  = Mage::registry('current_product');
             $customer = Mage::getSingleton('customer/session')->getCustomer();
-            $this->_model->_addItem($product);
+            $this->_model->_addItem($product->getId());
             $this->_model->_addAction($product->getId(), $customer->getId(), 'view');
         } else {
             $this->logGuestActions('view', Mage::registry('current_product'));
@@ -166,7 +166,7 @@ class Hackathon_Predictionio_Model_Observer
             $rating = $newSumRatings / count($data['ratings']);
 
             if (Mage::getSingleton('customer/session')->isLoggedIn()) {
-                $this->_model->_addItem($product);
+                $this->_model->_addItem($product->getId());
 //                $this->_model->_addAction($product->getId(), $customer->getId(), 'rate', $rating);
             } else {
                 $this->logGuestActions('rate', Mage::registry('current_product'), $rating);
