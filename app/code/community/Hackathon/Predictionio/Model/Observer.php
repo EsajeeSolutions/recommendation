@@ -116,7 +116,7 @@ class Hackathon_Predictionio_Model_Observer
             foreach ($guestActions['product_rate'] as $product_id => $rating) {
                 $product = Mage::getModel('catalog/product')->load($product_id);
                 $this->_model->_addItem($product);
-                $this->_model->_addAction($product_id, $customerId, 'rate', $rating);
+//                $this->_model->_addAction($product_id, $customerId, 'rate', $rating);
             }
         }
         Mage::getSingleton('core/session')->unsGuestActions();
@@ -167,7 +167,7 @@ class Hackathon_Predictionio_Model_Observer
 
             if (Mage::getSingleton('customer/session')->isLoggedIn()) {
                 $this->_model->_addItem($product);
-                $this->_model->_addAction($product->getId(), $customer->getId(), 'rate', $rating);
+//                $this->_model->_addAction($product->getId(), $customer->getId(), 'rate', $rating);
             } else {
                 $this->logGuestActions('rate', Mage::registry('current_product'), $rating);
             }
@@ -191,7 +191,7 @@ class Hackathon_Predictionio_Model_Observer
 
             foreach ($items as $item) {
                 $this->_model->_addItem($item->getProductId());
-                $this->_model->_addAction($item->getProductId(), $customer->getId(), 'conversion');
+                $this->_model->_addAction($item->getProductId(), $customer->getId(), 'purchase');
             }
         }
     }
