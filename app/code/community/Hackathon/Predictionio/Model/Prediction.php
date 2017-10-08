@@ -94,7 +94,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      *
      * @return void
      */
-    public function _addItems($products, $customerId)
+    public function _addOrder($products, $customerId, $action)
     {
         foreach ($products as $key => $productid) {
             $product = Mage::getModel('catalog/product')->load($productid);
@@ -107,13 +107,22 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                 } else {
                     $_productId = $product->getId();
                 }
-            }
+	    }
+
+	    $this->_addItem($_productId, $customerId);
+	    $this->_addAction($_productId, $customerId, $action);
+
         }
 
-        if (empty($_productId)) {
+    }
+
+    public function _addItem($productId, $customerId)
+    {
+        if (empty($productId) || empty($customerId)) {
             return false;
         }
-
+	// doing this second time, probably not wise TODO better
+	$product = Mage::getModel('catalog/product')->load($productId);
 	$eventTime  = (new DateTime('NOW'))->format(Hackathon_Predictionio_Helper_Data::DATE_TIME_FORMAT);
 	$cats    = $this->getCategories($product);
 	// replaced 4 next lines with cats
@@ -126,7 +135,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
             [
                 'event'      => '$set',
                 'entityType' => 'item',
-                'entityId'   => $_productId,
+                'entityId'   => $productId,
                 'properties' => $properties,
                 'eventTime'  => $eventTime,
             ]
