@@ -37,6 +37,8 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param Mage_Catalog_Model_Product $product Instance of Product Model
      */
+
+// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
     public function _addItem(Mage_Catalog_Model_Product $product)
     {
         $cats          = $this->getCategories($product);
@@ -52,6 +54,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param int $productid Product ID of purchased item
      */
+// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
     public function _addItems($productid)
     {
         $product = Mage::getModel('catalog/product')->load($productid);
@@ -80,6 +83,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      * @param int $productid  Product ID of item to action
      * @param int $customerId Customer ID of loggedin customer
      */
+// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
     public function _addAction($productId, $customerId, $action, $rate = null)
     {
 
@@ -101,6 +105,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string  Comma seperated categories
      */
+// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
     public function getCategories(Mage_Catalog_Model_Product $product)
     {
 
