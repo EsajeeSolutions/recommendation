@@ -132,6 +132,7 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return mixed (Array of product ID's or NULL when empty)
      */
+// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
     public function getSimilarProducts(Mage_Catalog_Model_Product $product)
     {
 

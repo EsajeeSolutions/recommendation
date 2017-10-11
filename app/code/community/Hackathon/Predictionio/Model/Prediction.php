@@ -12,6 +12,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 	 * @param int $customerId
 	 * @param int $numProducts
 	 */
+
+// OUTDATED
     public function getRecommendedProducts($customerId, $numProducts) {
 	$json = json_encode(
 		[
@@ -27,6 +29,38 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         ));
     }
 
+    public function getSimilarProducts($product, $numProducts = null ) {
+
+        if (!isset($numProducts)) {
+                $numProducts = $this->getHelper()->getProductCount();
+        }
+
+        $productId = $product->getId();
+        $json = json_encode(
+                [
+                        'item'   => $productId,
+                        'num'     => $numProducts
+                ]
+        );
+
+        $result = json_decode($this->postRequest(
+                                $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
+                                Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
+                                $json, 1
+                                ), true
+        );
+        // from an array like ( "itemScores" => array( "item" => "id1", "score" => "score1"), ...)
+        // get item ids
+        $result = array_map(function($element) { return $element['item']; } , $result['itemScores']);
+
+        if (isset($result)) {
+            return $result;
+        } else {
+            return null;
+        }
+
+    }
+
     /**
      * Perform the POST Request
      *
@@ -35,7 +69,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      *
      * @return void
      */
-    public function postRequest($url, $json)
+    public function postRequest($url, $json, $returnResult = null)
     {
         $client = new Zend_Http_Client(
             'http://' . $url,
@@ -43,17 +77,22 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                 'maxredirects' => 0,
                 'timeout'      => 1)
         );
-        $client->setRawData($json, 'application/json')->request('POST');
-	$status = $client->getLastResponse();
+        $client->setRawData($json, 'application/json');
+        $responce_body = Zend_Http_Response::fromString($client->request('POST'))->getBody();
+	$status = $client->getLastResponse()->getStatus();
        
-        Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
-        Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
-        Mage::log('Status: ' . $status . "\n", null, 'predictionio.log');
-        Mage::log('Status code: ' . $status->getStatus() . "\n", null, 'predictionio.log');
+//	Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
+//	Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
+//	Mage::log('Status: ' . $status . "\n", null, 'predictionio.log');
+//      Mage::log('Body: ' . $responce_body . "\n", null, 'predictionio.log');
 
-	if ($status->getStatus() == 400) { // log bad request
+	if ($status == 400) { // log bad request
 		Mage::log("Prediction/postRequest/BadRequest " . $json, null, 'predictionio.log');
         };
+
+        if (isset($returnResult)) {
+                return $responce_body;
+        }
     }
 
     /**

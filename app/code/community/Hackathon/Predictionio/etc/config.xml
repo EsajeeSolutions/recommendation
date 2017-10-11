@@ -24,22 +24,32 @@
         <class>Hackathon_Predictionio_Helper</class>
       </predictionio>
     </helpers>
-  	<blocks>
-  	  <predictionio>
-  		<class>Hackathon_Predictionio_Block</class>
-  	  </predictionio>
-  			<catalog>
-  				<rewrite>
-  					<product_list_upsell>Hackathon_Predictionio_Block_Catalog_Product_List_Upsell</product_list_upsell>
-  				</rewrite>
-  			</catalog>
-  	</blocks>
-  	<models>
-  	  <predictionio>
-  		  <class>Hackathon_Predictionio_Model</class>
-  		  <resourceModel>predictionio_mysql4</resourceModel>
-  	  </predictionio>
-  	</models>
+    <blocks>
+      <predictionio>
+        <class>Hackathon_Predictionio_Block</class>
+      </predictionio>
+<!-- Disabled since we use easytabs
+      <catalog>
+        <rewrite>
+          <product_list_upsell>Hackathon_Predictionio_Block_Catalog_Product_List_Upsell</product_list_upsell>
+        </rewrite>
+      </catalog>
+      Disable the one below and re-enable this if you don't have easy tabs      -->
+      <easytabs>
+        <rewrite>
+          <tab_product_upsell>Hackathon_Predictionio_Block_Tab_Product_Upsell</tab_product_upsell>
+        </rewrite>
+      </easytabs>
+
+    </blocks>
+    
+    <models>
+      <predictionio>
+        <class>Hackathon_Predictionio_Model</class>
+        <resourceModel>predictionio_mysql4</resourceModel>
+      </predictionio>
+    </models>
+    
     <events>
 
       <!-- Add Customer once they Login and process any guest actions in the session -->
@@ -65,6 +75,7 @@
       </catalog_controller_product_view>
 
       <!-- Log product review and rating with PredictionIO -->
+<!-- DISABLED, we dont save reviews, unsupported
       <review_save_after>
         <observers>
           <review_save_after_handler>
@@ -74,7 +85,7 @@
           </review_save_after_handler>
         </observers>
       </review_save_after>
-
+-->
       <!-- Log product conversion for each product in order -->
       <checkout_type_onepage_save_order_after>
           <observers>

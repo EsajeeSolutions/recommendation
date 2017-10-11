@@ -8,7 +8,7 @@
  * @author 		Steven Richardson (steven@richdynamix.com) @troongizmo
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Hackathon_Predictionio_Block_Catalog_Product_List_Upsell extends Mage_Catalog_Block_Product_List_Upsell
+class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_Tab_Product_Upsell
 {
 	/**
 	 * Rewrite of parent::_prepareData() if 
