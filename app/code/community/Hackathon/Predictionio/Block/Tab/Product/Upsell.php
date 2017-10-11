@@ -22,7 +22,9 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
         $_model  = Mage::getModel('predictionio/prediction');
     	$product = Mage::registry('product');
 
-    	if ($_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
+//    	if ($_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
+//	we want recommand even for guests
+	if ($_helper->isEnabled()) {
 	    	if ($similarproducts = $_model->getSimilarProducts($product)) {
 	    	
 	            $collection = Mage::getResourceModel('catalog/product_collection');

@@ -39,7 +39,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         $json = json_encode(
                 [
                         'item'   => $productId,
-                        'num'     => $numProducts
+                        'num'    => $numProducts
                 ]
         );
 
