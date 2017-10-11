@@ -50,13 +50,21 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                                 ), true
         );
         // from an array like ( "itemScores" => array( "item" => "id1", "score" => "score1"), ...)
-        // get item ids
-        $result = array_map(function($element) { return $element['item']; } , $result['itemScores']);
-
+        // get item ids that are great then $score_threshold
+        $score_threshold = $this->getHelper()->getScoreThreshold();
         if (isset($result)) {
-            return $result;
+                $array = array();
+                foreach ($result['itemScores'] as $prediction) {
+
+                        if ($prediction['score'] > $score_threshold ) {
+                                $array[] = $prediction['item'];
+                        }
+                }
+
+                return $array;
+
         } else {
-            return null;
+                return null;
         }
 
     }

@@ -301,4 +301,14 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfig('predictionio/settings/product_count');
     }
 
+    /**
+     * Get minimum score for upsell recommendations
+     *  
+     * @return int
+     */
+    public function getScoreThreshold()
+    {   
+        return Mage::getStoreConfig('predictionio/settings/score_threshold');
+    }
+
 }
