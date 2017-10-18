@@ -6,53 +6,20 @@
 class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 {
     private $_helper = null;
-	/**
-	 * Get a specific amount ofrecommended products for the user
-	 *
-	 * @param int $customerId
-	 * @param int $numProducts
-	 */
 
-// OUTDATED
-    public function getRecommendedProducts($customerId, $numProducts) {
-	$json = json_encode(
-		[
-			'uid'	=> $customerId,
-			'n'	=> $numProducts
-		]
-	);
+    /**
+     * Filter Recoomendations based on score set in Configuration
+     *
+     * @param string $json JSON responce from PredictionIO API
+     *
+     * @return array of items OR null
+     */
+    public function filterRecommendations($json) {
 
-	$result = json_decode($this->postRequest(
-		$this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
-		Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
-		$json
-        ));
-    }
-
-    public function getSimilarProducts($product, $numProducts = null ) {
-
-        if (!isset($numProducts)) {
-                $numProducts = $this->getHelper()->getProductCount();
-        }
-
-        $productId = $product->getId();
-        $json = json_encode(
-                [
-                        'item'   => $productId,
-                        'num'    => $numProducts
-                ]
-        );
-
-        $result = json_decode($this->postRequest(
-                                $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
-                                Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
-                                $json, 1
-                                ), true
-        );
         // from an array like ( "itemScores" => array( "item" => "id1", "score" => "score1"), ...)
-        // get item ids that are great then $score_threshold
+        // get item ids that are greater then $score_threshold
         $score_threshold = $this->getHelper()->getScoreThreshold();
-        if (isset($result)) {
+        if (isset($json)) {
                 $array = array();
                 foreach ($result['itemScores'] as $prediction) {
 
@@ -65,9 +32,44 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 
         } else {
                 return null;
+        }	
+
+    };
+
+    /**
+     * Perform the POST Request to get recommendation from engine
+     *
+     * @param int $id id of customer or item to base recommendation on
+     * @param string $type either 'user' or 'item'
+     *
+     * @return array of items
+     */
+    public function getRecommendedProducts($id, $type = null) {
+
+        $numProducts = $this->getHelper()->getProductCount();
+
+	// default recommendation is item based
+	if (!isset($type)) {
+                $type = 'item';
         }
 
-    }
+        $json = json_encode(
+                [
+                        $type   => $id,
+                        'num'   => $numProducts
+                ]
+        );
+
+        $result = json_decode($this->postRequest(
+                                $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
+                                Hackathon_Predictionio_Helper_Data::PREDICTION_QUERY_API_ENDPOINT,
+                                $json, 1
+                                ), true
+        );
+
+        return filterRecommendations($result);
+
+     }
 
     /**
      * Perform the POST Request

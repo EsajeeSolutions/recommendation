@@ -24,6 +24,7 @@ class Hackathon_Predictionio_Block_Catalog_Product_List_Upsell extends Mage_Cata
 
 //    	if ($_helper->isEnabled() && Mage::getSingleton('customer/session')->isLoggedIn()) {
 //	we want recommand even for guests
+// OUTDATED, copy the one from Tab
 	if ($_helper->isEnabled()) {
 	    	if ($similarproducts = $_model->getSimilarProducts($product)) {
 	    	
