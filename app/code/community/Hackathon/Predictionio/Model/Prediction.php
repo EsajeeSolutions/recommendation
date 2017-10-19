@@ -15,26 +15,31 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      * @return array of items OR null
      */
     public function filterRecommendations($json) {
-
+	
         // from an array like ( "itemScores" => array( "item" => "id1", "score" => "score1"), ...)
         // get item ids that are greater then $score_threshold
         $score_threshold = $this->getHelper()->getScoreThreshold();
         if (isset($json)) {
                 $array = array();
-                foreach ($result['itemScores'] as $prediction) {
+                foreach ($json['itemScores'] as $prediction) {
 
                         if ($prediction['score'] > $score_threshold ) {
                                 $array[] = $prediction['item'];
                         }
                 }
 
-                return $array;
+		// if there is anything in array, return
+		if (!empty($array)) {		
+	                return $array;
+		} else {
+			return null;
+		}
 
         } else {
                 return null;
         }	
 
-    };
+    }
 
     /**
      * Perform the POST Request to get recommendation from engine
@@ -58,7 +63,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                         $type   => $id,
                         'num'   => $numProducts
                 ]
-        );
+	// to encode int as int, otherwise it will be encoded as string
+        , JSON_NUMERIC_CHECK);
 
         $result = json_decode($this->postRequest(
                                 $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
@@ -67,7 +73,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                                 ), true
         );
 
-        return filterRecommendations($result);
+	$filteredResult = $this->filterRecommendations($result);
+        return $filteredResult;
 
      }
 
@@ -94,7 +101,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 //	Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
 //	Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
 //	Mage::log('Status: ' . $status . "\n", null, 'predictionio.log');
-//      Mage::log('Body: ' . $responce_body . "\n", null, 'predictionio.log');
+//	Mage::log('Body: ' . $responce_body . "\n", null, 'predictionio.log');
 
 	if ($status == 400) { // log bad request
 		Mage::log("Prediction/postRequest/BadRequest " . $json, null, 'predictionio.log');
