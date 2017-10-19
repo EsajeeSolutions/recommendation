@@ -23,23 +23,29 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
     	$product = Mage::registry('product');
 	$productId = $product->getId();
 
-//	we want recommand even for guests
-	if ($_helper->isEnabled()) {
-		// customer based prediction if we can get customer id
-		if ( Mage::getSingleton('customer/session')->isLoggedIn()) || <guest can be tracked to customer> ) {
-		    
-			
-			$cutomerId = Mage::getSingleton('customer/session')->getCustomerId();
-			$recommendedproducts = $_model->getRecommendedProducts($customerId, 'user');
-		// otherwise get recommendation based on viewed item
-		} else {
+	$raw_guestData = Mage::getModel('core/cookie')->get('userData');
+        $guestuserID = json_decode($raw_guestData)->userID;
 
-	    		$recommendedproducts = $_model->getRecommendedProducts($productId))
-	    	
+	if ($_helper->isEnabled()) {
+		// if user is logged in get his ID
+		if ( Mage::getSingleton('customer/session')->isLoggedIn()) {
+			$customerId = Mage::getSingleton('customer/session')->getCustomerId();
+		// if not, assign ID from guest userData
+		} else {
+			$customerId = $guestuserID;
+		}
+		// if we have valid customerId recommenend based on it
+		if ( !isset($customerId && $cutomerId != 'GUEST' ) {
+			$recommendedproducts = $_model->getRecommendedProducts($customerId, 'user');
+		}
+		// recommend based on item is user recommendation is empty
+		// or if user recommendation is not applicable
+		if ( !isset($recommendedproducts) ) {
+	    		$recommendedproducts = $_model->getRecommendedProducts($productId, 'item'))
 		}
 		// if any recommendation returned from engine
 		// show them
-		if (!isset($recommendedproducts)) {
+		if (isset($recommendedproducts)) {
 
 			$collection = Mage::getResourceModel('catalog/product_collection');
 			Mage::getModel('catalog/layer')->prepareProductCollection($collection);
