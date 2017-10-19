@@ -63,8 +63,9 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                         $type   => $id,
                         'num'   => $numProducts
                 ]
-	// to encode int as int, otherwise it will be encoded as string
-        , JSON_NUMERIC_CHECK);
+	// below ensures that int encoded as int, otherwise it will be encoded as string
+        , JSON_NUMERIC_CHECK
+	);
 
         $result = json_decode($this->postRequest(
                                 $this->getHelper()->getApiHost() . ':' . $this->getHelper()->getApiRecommendationPort() . '/' .
