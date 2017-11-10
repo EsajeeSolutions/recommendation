@@ -22,6 +22,21 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
         $this->refactor_model = Mage::getModel('predictionio/prediction');
     }
 
+
+        public function connect_to_write($table) {
+
+                if(!isset(self::$writeConnection)) {
+                        $resource = Mage::getSingleton('core/resource');
+                        $writeConnection = $resource->getConnection('core_write');
+                        $tableName = $resource->getTableName($table);
+
+                }
+
+                return $writeConnection;
+
+        }
+
+
     /**
      * Sets up cURL request paramaters for adding a customer
      *
