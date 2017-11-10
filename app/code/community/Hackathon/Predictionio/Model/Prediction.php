@@ -49,14 +49,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      *
      * @return array of items
      */
-    public function getRecommendedProducts($id, $type = null) {
-
-        $numProducts = $this->getHelper()->getProductCount();
-
-	// default recommendation is item based
-	if (!isset($type)) {
-                $type = 'item';
-        }
+    public function getRecommendedProducts($id, $type = 'item', $sessionId) {
 
         $json = json_encode(
                 [
@@ -73,6 +66,21 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                                 $json, 1
                                 ), true
         );
+
+	// specify table to log predictions
+	$table = 'log_prediction';
+	$conn = $this->getHelper()->connect_to_write($table);
+
+	// store each prediction in table above
+	foreach ($result['itemScores'] as $prediction) {
+
+		$query = "INSERT INTO $table (item_id, score, type, session_id) VALUES ("
+		. $prediction['item'] . ", "
+		. $prediction['score'] . ", '$type', '$sessionId');";
+		
+		$conn->query($query);	
+	
+	}
 
 	$filteredResult = $this->filterRecommendations($result);
         return $filteredResult;
@@ -95,8 +103,26 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
                 'maxredirects' => 0,
                 'timeout'      => 1)
         );
+
         $client->setRawData($json, 'application/json');
-        $responce_body = Zend_Http_Response::fromString($client->request('POST'))->getBody();
+
+	// we want to catch errors if server fails to respond
+	try {
+
+		$send_request = Zend_Http_Response::fromString($client->request('POST'));
+
+	} catch(Zend_Http_Client_Exception $e) {
+
+		// log error and return null if required
+		Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
+	        Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
+		Mage::log('Error: ' . $e . "\n", null, 'predictionio.log');
+
+		if (isset($returnResult)) {
+			return array();
+		}
+	}
+        $responce_body = $send_request->getBody();
 	$status = $client->getLastResponse()->getStatus();
        
 //	Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
