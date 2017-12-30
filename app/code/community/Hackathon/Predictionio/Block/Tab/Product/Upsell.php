@@ -24,7 +24,9 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
 	$productId = $product->getId();
 
 	$raw_guestData = Mage::getModel('core/cookie')->get('userData');
-        $guestuserID = json_decode($raw_guestData)->userID;
+	if (isset($raw_guestData->userID)) {
+	        $guestuserID = json_decode($raw_guestData)->userID;
+	}
 
 	// Visitor ID is Magento's internal ID
 	// We need it to link prediction to Visitor
@@ -38,8 +40,8 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
 		// if user is logged in get his ID
 		if ( Mage::getSingleton('customer/session')->isLoggedIn()) {
 			$customerId = Mage::getSingleton('customer/session')->getCustomerId();
-		// if not, assign ID from guest userData
-		} else {
+		// if not, assign ID from guest userData if it exists
+		} elseif (isset($guestuserID)) {
 			$customerId = $guestuserID;
 		}
 		// if we have valid customerId recommenend based on it

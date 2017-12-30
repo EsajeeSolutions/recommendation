@@ -30,6 +30,7 @@ class Hackathon_Predictionio_Model_Observer
         $this->_helper = Mage::helper('predictionio');
     }
 
+
     /**
      * When the customer is not logged in we should still capture
      * data in case they login at basket after viewing several
