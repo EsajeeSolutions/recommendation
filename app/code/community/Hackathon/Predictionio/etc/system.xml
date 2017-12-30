@@ -108,6 +108,26 @@
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
           </score_threshold>
+          <debug translate="label">
+            <label>Debug</label>
+            <comment>Enable debug to log file specified below</comment>
+            <frontend_type>select</frontend_type>
+            <source_model>adminhtml/system_config_source_yesno</source_model>
+            <sort_order>8</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+          </debug>
+          <debug_file_path translate="label">
+            <label>Debug File Path</label>
+	    <comment>Specify where to output debug information. Default System Log File Name is used.</comment>
+            <frontend_type>text</frontend_type>
+            <sort_order>9</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+          </debug_file_path>
+
 	   </fields>
 	   </settings>
 	</groups>

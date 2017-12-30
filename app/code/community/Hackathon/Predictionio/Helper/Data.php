@@ -326,4 +326,43 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfig('predictionio/settings/score_threshold');
     }
 
+    /**
+     * Get debug option
+     *
+     * @return int
+     */
+    public function getDebug()
+    {   
+        return Mage::getStoreConfig('predictionio/settings/debug');
+    }
+
+    /**
+     * Get debug file path
+     *
+     * @return int
+     */
+    public function getDebugFilePath()
+    {   
+        return Mage::getStoreConfig('predictionio/settings/debug_file_path');
+    }
+
+    /**
+     * If Debug is enabled in configuration
+     * Output to specified file or to system.log
+     */
+    public function logThis($header, $message) {
+
+        if ($this->getDebug()) {
+                $logFile = $this->getDebugFilePath();
+
+                if (isset($logFile)) {
+                        Mage::log($header . ": " . $message . "\n", null, $logFile);
+                } else {
+                        Mage::log($header . ": " . $message . "\n");
+                }
+
+        }
+     }
+
+
 }
