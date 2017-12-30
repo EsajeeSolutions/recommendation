@@ -51,6 +51,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      */
     public function getRecommendedProducts($id, $type = 'item', $sessionId) {
 
+	$numProducts = $this->getHelper()->getProductCount();
+
         $json = json_encode(
                 [
                         $type   => $id,
@@ -125,10 +127,10 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         $responce_body = $send_request->getBody();
 	$status = $client->getLastResponse()->getStatus();
        
-//	Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
-//	Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
-//	Mage::log('Status: ' . $status . "\n", null, 'predictionio.log');
-//	Mage::log('Body: ' . $responce_body . "\n", null, 'predictionio.log');
+	$this->getHelper()->logThis('URL', $url);
+	$this->getHelper()->logThis('JSON', $json);
+	$this->getHelper()->logThis('Status', $status);
+	$this->getHelper()->logThis('Body', $responce_body);
 
 	if ($status == 400) { // log bad request
 		Mage::log("Prediction/postRequest/BadRequest " . $json, null, 'predictionio.log');
