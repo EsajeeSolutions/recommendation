@@ -41,6 +41,37 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 
     }
 
+
+    public function biasCategory($id) {
+
+	$this->getHelper()->logThis('biasCategory');
+        // check if we need to category based prediction based on URL params
+        $disableCategoryBased = Mage::app()->getRequest()->getParam('disableCategoryBased');
+	if ($this->getHelper()->isCategoryResults() and !isset($disableCategoryBased)) {
+
+		// doing this second time, probably not wise TODO better
+		$product = Mage::getModel('catalog/product')->load($id);
+		$cats    = $this->getCategories($product);
+		// replaced 4 next lines with cats
+#		$categories = array(explode(",", $cats));
+		$categories = explode(",", $cats);
+		if (empty($categories)) {
+			$categories = (object) $categories;
+		}
+
+		$bias = array("name" => "category",
+			      "values" => $categories,
+			      "bias" => -1
+			);
+
+	} else {
+		$bias = array();
+	} 
+
+	return $bias;
+
+    }
+
     /**
      * Perform the POST Request to get recommendation from engine
      *
@@ -49,14 +80,23 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
      *
      * @return array of items
      */
-    public function getRecommendedProducts($id, $type = 'item', $sessionId) {
+    public function getRecommendedProducts($id, $type = 'item', $sessionId, $relateToProduct) {
+
+	$this->getHelper()->logThis('getRecommendedProducts');
 
 	$numProducts = $this->getHelper()->getProductCount();
+
+	$this->getHelper()->logThis('pre:biasCategory');
+
+	$fields = $this->biasCategory($relateToProduct);
+
+	$this->getHelper()->logThis('post:biasCategory');
 
         $json = json_encode(
                 [
                         $type   => $id,
-                        'num'   => $numProducts
+                        'num'   => $numProducts,
+			'fields' => array($fields)
                 ]
 	// below ensures that int encoded as int, otherwise it will be encoded as string
         , JSON_NUMERIC_CHECK
@@ -112,6 +152,8 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 	try {
 
 		$send_request = Zend_Http_Response::fromString($client->request('POST'));
+		$responce_body = $send_request->getBody();
+		$status = $client->getLastResponse()->getStatus();
 
 	} catch(Zend_Http_Client_Exception $e) {
 
@@ -124,8 +166,6 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 			return array();
 		}
 	}
-        $responce_body = $send_request->getBody();
-	$status = $client->getLastResponse()->getStatus();
        
 	$this->getHelper()->logThis('URL', $url);
 	$this->getHelper()->logThis('JSON', $json);
