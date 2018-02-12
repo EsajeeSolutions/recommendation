@@ -6,7 +6,8 @@
  *
  * @category      Richdynamix
  * @package       Richdynamix_SimilarProducts
- * @author        Steven Richardson (steven@richdynamix.com) @troongizmo
+ * @original_author        Steven Richardson (steven@richdynamix.com) @troongizmo
+ * @maintainer		Dima Kovalyov (dimdroll@gmail.com)
  * @license       http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
@@ -23,157 +24,19 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
 
-        public function connect_to_write($table) {
+    public function connect_to_write($table) {
 
-                if(!isset(self::$writeConnection)) {
-                        $resource = Mage::getSingleton('core/resource');
-                        $writeConnection = $resource->getConnection('core_write');
-                        $tableName = $resource->getTableName($table);
-
-                }
-
-                return $writeConnection;
+        if(!isset(self::$writeConnection)) {
+            $resource = Mage::getSingleton('core/resource');
+            $writeConnection = $resource->getConnection('core_write');
+            $tableName = $resource->getTableName($table);
 
         }
 
-
-    /**
-     * Sets up cURL request paramaters for adding a customer
-     *
-     * @param int $customerId Customer ID of loggedin customer
-     */
-    public function _addCustomer($customerId)
-    {
-        $this->refactor_model->_addCustomer($customerId);
-    }
-
-    /**
-     * Sets up cURL request paramaters for adding a product
-     *
-     * @param Mage_Catalog_Model_Product $product Instance of Product Model
-     */
-
-// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
-    public function _addItem(Mage_Catalog_Model_Product $product)
-    {
-        $cats          = $this->getCategories($product);
-        $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
-        $fields_string .= 'pio_iid=' . $product->getId() . '&';
-        $fields_string .= 'pio_itypes=' . $cats;
-        $this->sendData($this->getApiHost() . ':' . $this->getApiPort() . '/' . $this->_itemsUrl, $fields_string);
-    }
-
-    /**
-     * Sets up cURL request paramaters for adding a parent
-     * item of ordered product (Since Upsells can only be shown on parents)
-     *
-     * @param int $productid Product ID of purchased item
-     */
-// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
-    public function _addItems($productid)
-    {
-        $product = Mage::getModel('catalog/product')->load($productid);
-        $cats    = $this->getCategories($product);
-        if ($product->getTypeId() == "simple") {
-            $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
-            if (!$parentIds)
-                $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-            if (isset($parentIds[0])) {
-                $_productId = $parentIds[0];
-            } else {
-                $_productId = $product->getId();
-            }
-        }
-
-        $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
-        $fields_string .= 'pio_iid=' . $_productId . '&';
-        $fields_string .= 'pio_itypes=' . $cats;
-        $this->sendData($this->getApiHost() . ':' . $this->getApiPort() . '/' . $this->_itemsUrl, $fields_string);
+        return $writeConnection;
 
     }
 
-    /**
-     * Sets up cURL request paramaters for adding a user-to-item action
-     *
-     * @param int $productid  Product ID of item to action
-     * @param int $customerId Customer ID of loggedin customer
-     */
-// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
-    public function _addAction($productId, $customerId, $action, $rate = null)
-    {
-
-        $fields_string = 'pio_appkey=' . $this->getEngineKey() . '&';
-        $fields_string .= 'pio_uid=' . $customerId . '&';
-        $fields_string .= 'pio_iid=' . $productId . '&';
-        if ($rate != null) {
-            $fields_string .= 'pio_rate=' . $rate . '&';
-        }
-        $fields_string .= 'pio_action=' . $action;
-        $this->sendData($this->getApiHost() . ':' . $this->getApiPort() . '/' . $this->_actionsUrl, $fields_string);
-    }
-
-    /**
-     * Gets comma seperated list of categories
-     * belonging to product, used for pio_itypes in PredictionIO
-     *
-     * @param  Mage_Catalog_Model_Product $product Instance of Product Model
-     *
-     * @return string  Comma seperated categories
-     */
-// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
-    public function getCategories(Mage_Catalog_Model_Product $product)
-    {
-
-        if ($product->getId()) {
-            $categoryIds = $product->getCategoryIds();
-            if (is_array($categoryIds) and count($categoryIds) >= 1) {
-                $catsString = '';
-                foreach ($categoryIds as $id) {
-                    $cat = Mage::getModel('catalog/category')->load($id);
-                    $catsString .= $cat->getName() . ',';
-                }
-                $cats = rtrim($catsString, ",");
-                return $cats;
-            }
-            return '';
-        }
-    }
-
-    /**
-     * Sets up cURL request paramaters for getting similar products
-     * from PredictionIO after data is trained
-     *
-     * @param  Mage_Catalog_Model_Product $product Instance of Product Model
-     *
-     * @return mixed (Array of product ID's or NULL when empty)
-     */
-// IT IS NOT USED, USE THE ONE FROM MODEL INSTEAD
-    public function getSimilarProducts(Mage_Catalog_Model_Product $product)
-    {
-
-        $engineUrl = str_replace('{engine}', $this->getEngineName(), $this->_engineUrl);
-
-        $_currentProduct = 'pio_iid=' . $product->getId();
-
-        $_maxProductCount = 'pio_n=' . $this->getProductCount();
-        $_key             = 'pio_appkey=' . $this->getEngineKey();
-
-        $cats = '';
-        if ($this->isCategoryResults()) {
-            $cats = '&pio_itypes=' . $this->getCategories($product);
-        }
-
-        $url   = $this->getApiHost() . ':' . $this->getApiPort() . '/' . $engineUrl;
-        $query = '?' . $_currentProduct . '&' . $_maxProductCount . '&' . $_key . $cats;
-
-        $content = json_decode($this->getData($url, $query));
-
-        if (isset($content->pio_iids)) {
-            return $content->pio_iids;
-        } else {
-            return null;
-        }
-    }
 
     /**
      * Perform the cURL GET Request
@@ -199,31 +62,6 @@ class Hackathon_Predictionio_Helper_Data extends Mage_Core_Helper_Abstract
         curl_close($ch);
 
         return $content;
-    }
-
-    /**
-     * Perform the cURL POST Request
-     *
-     * @param  string $url           URL of PredictionIO API
-     * @param  string $fields_string Query params for POST data
-     */
-    public function sendData($url, $fields_string)
-    {
-        //open connection
-        $ch = curl_init();
-
-        //set the url, number of POST vars, POST data
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields_string);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-
-        //execute post
-        $result = curl_exec($ch);
-
-        //close connection
-        curl_close($ch);
     }
 
     /**
