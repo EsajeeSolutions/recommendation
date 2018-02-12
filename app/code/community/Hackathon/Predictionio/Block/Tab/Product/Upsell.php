@@ -22,6 +22,9 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
         $_model  = Mage::getModel('predictionio/prediction');
     	$product = Mage::registry('product');
 	$productId = $product->getId();
+	
+	// check if we need to disable PredictionIO based on URL params
+	$disablePrediction = Mage::app()->getRequest()->getParam('disableIO');
 
 	$raw_guestData = Mage::getModel('core/cookie')->get('userData');
 	if (isset($raw_guestData->userID)) {
@@ -36,7 +39,9 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
 		$sessionId= 'NULL';
 	}
 	// if module is enabled
-	if ($_helper->isEnabled()) {
+	// and if it is not disabled via query string like:
+	// http://107.167.185.249/ginger-sesame-salad-dressing.html?disableIO=false
+	if ($_helper->isEnabled() and !isset($disablePrediction)) {
 		// if user is logged in get his ID
 		if ( Mage::getSingleton('customer/session')->isLoggedIn()) {
 			$customerId = Mage::getSingleton('customer/session')->getCustomerId();
@@ -44,15 +49,28 @@ class Hackathon_Predictionio_Block_Tab_Product_Upsell extends TM_EasyTabs_Block_
 		} elseif (isset($guestuserID)) {
 			$customerId = $guestuserID;
 		}
+		$_helper->logThis('Upsell.php:pre-getRecommendedProducts');
 		// if we have valid customerId recommenend based on it
 		if ( isset($customerId) && $customerId != 'GUEST' ) {
-			$recommendedproducts = $_model->getRecommendedProducts($customerId, 'user', $sessionId);
+			$_helper->logThis('User based recommendation');
+			try {
+				$recommendedproducts = $_model->getRecommendedProducts($customerId, 'user', $sessionId, $productId);
+			} catch (Exception $e) {
+				$_helper->logThis('EXCEPTION: ', $e);
+			}
 		}
 		// recommend based on item is user recommendation is empty
 		// or if user recommendation is not applicable
 		if ( !isset($recommendedproducts) ) {
-	    		$recommendedproducts = $_model->getRecommendedProducts($productId, 'item', $sessionId);
+			$_helper->logThis('Item based recommendation');
+			try {
+		    		$recommendedproducts = $_model->getRecommendedProducts($productId, 'item', $sessionId, $productId);
+			} catch (Exception $e) {
+				$_helper->logThis('EXCEPTION: ', $e);
+			}
 		}
+
+		$_helper->logThis('Upsell.php:pre-recommendedproducts');
 		// if any recommendation returned from engine
 		// show them
 		if (isset($recommendedproducts)) {
