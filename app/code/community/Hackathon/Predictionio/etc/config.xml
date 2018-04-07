@@ -28,18 +28,19 @@
       <predictionio>
         <class>Hackathon_Predictionio_Block</class>
       </predictionio>
-<!-- Disabled since we use easytabs
       <catalog>
         <rewrite>
           <product_list_upsell>Hackathon_Predictionio_Block_Catalog_Product_List_Upsell</product_list_upsell>
         </rewrite>
       </catalog>
-      Disable the one below and re-enable this if you don't have easy tabs      -->
+<!-- Disable easytab 
       <easytabs>
         <rewrite>
           <tab_product_upsell>Hackathon_Predictionio_Block_Tab_Product_Upsell</tab_product_upsell>
         </rewrite>
       </easytabs>
+ -->
+
 
     </blocks>
     
