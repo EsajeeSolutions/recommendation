@@ -158,9 +158,9 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 	} catch(Zend_Http_Client_Exception $e) {
 
 		// log error and return null if required
-		Mage::log('URL: ' . $url . "\n", null, 'predictionio.log');
-	        Mage::log('JSON: ' . $json . "\n", null, 'predictionio.log');
-		Mage::log('Error: ' . $e . "\n", null, 'predictionio.log');
+		$this->getHelper()->logThis('URL', $url);
+	        $this->getHelper()->logThis('JSON', $json);
+		$this->getHelper()->logThis('Error', $e);
 
 		if (isset($returnResult)) {
 			return array();
@@ -173,7 +173,7 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
 	$this->getHelper()->logThis('Body', $responce_body);
 
 	if ($status == 400) { // log bad request
-		Mage::log("Prediction/postRequest/BadRequest " . $json, null, 'predictionio.log');
+		$this->getHelper()->logThis('Prediction/postRequest/BadRequest', $json);
         };
 
         if (isset($returnResult)) {
