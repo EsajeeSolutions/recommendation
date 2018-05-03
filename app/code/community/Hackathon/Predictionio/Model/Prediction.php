@@ -8,7 +8,32 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
     private $_helper = null;
 
     /**
-     * Filter Recoomendations based on score set in Configuration
+     * Return True if item is in Stock or Null if not
+     *
+     * @param string $id 
+     *
+     * @return True OR null
+     */
+
+    public function inStock($id) {
+
+        $isInStock = $id->getStockItem()->getIsInStock();
+
+        if ($isInStock) {
+
+                return True;
+
+        } else {
+
+                return False;
+
+        }
+
+
+    }
+
+    /**
+     * Filter Recoomendations based on score set in Configuration and exclude out of stock items
      *
      * @param string $json JSON responce from PredictionIO API
      *
@@ -22,8 +47,12 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         if (isset($json)) {
                 $array = array();
                 foreach ($json['itemScores'] as $prediction) {
-
-                        if ($prediction['score'] > $score_threshold ) {
+			
+			$product = Mage::getModel('catalog/product')->load($prediction['item']);
+// uncomment one of the below ifs, first one to remove out of stock items
+// second to show them
+                        if ($prediction['score'] > $score_threshold and $this->inStock($product)) {
+//			if ($prediction['score'] > $score_threshold) {
                                 $array[] = $prediction['item'];
                         }
                 }
@@ -40,7 +69,6 @@ class Hackathon_Predictionio_Model_Prediction extends Mage_Core_Model_Abstract
         }	
 
     }
-
 
     public function biasCategory($id) {
 
